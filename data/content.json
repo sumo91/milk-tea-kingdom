@@ -1,7 +1,7 @@
 {
   "theme_id": "milk_tea",
   "theme_title": "奶茶王国",
-  "notes": "V0-Q: HUD 挂 short_desc/unlock_copy/ui_strings；摊位 unlock 与 buildings 对齐为 0（开局自动卖）。",
+  "notes": "V0-M 竖屏字数：站卡副文≤12；升级效果/回本≤14；按钮≤4（升级/收下/卖出）。",
   "resources": [
     {
       "key": "ingredient",
@@ -40,8 +40,8 @@
       "unlock_copy": "",
       "icon_asset": "UI_ICON_STATION_SHELF",
       "icon_hint": "茶垄/茶叶货架",
-      "short_desc": "采茶叶 · 原料仓",
-      "line_hint": "茶叶堆在涨"
+      "short_desc": "采茶叶",
+      "line_hint": "原料仓在涨"
     },
     {
       "id": "brew_station",
@@ -50,8 +50,8 @@
       "unlock_copy": "",
       "icon_asset": "UI_ICON_STATION_BREW",
       "icon_hint": "摇杯/煮茶灶",
-      "short_desc": "10 叶 → 1 杯",
-      "line_hint": "摇出杯装奶茶"
+      "short_desc": "10叶→1杯",
+      "line_hint": "摇出杯装"
     },
     {
       "id": "stall",
@@ -60,8 +60,9 @@
       "unlock_copy": "摊位已开张：杯装会自动卖成金币和声望。",
       "icon_asset": "UI_ICON_STATION_STALL",
       "icon_hint": "奶茶摊位",
-      "short_desc": "自动卖杯换金",
-      "line_hint": "客人来了就卖"
+      "short_desc": "自动卖",
+      "line_hint": "卖杯换金",
+      "unlock_copy_short": "声望够了·摊位开张"
     }
   ],
   "ui_strings": {
@@ -69,18 +70,19 @@
     "line_title": "产线",
     "upgrade_title": "升级",
     "upgrade_btn": "升级",
-    "sell_all": "卖出全部奶茶",
-    "locked_fmt": "声望 {n} 解锁",
+    "sell_all": "卖出",
+    "locked_fmt": "声望{n}",
     "level_fmt": "Lv{n}",
-    "payback_fmt": "回本 ~{min} 分钟",
-    "offline_title": "店员帮你看店",
-    "offline_duration_fmt": "离开了 {duration}",
+    "payback_fmt": "回本~{min}分",
+    "offline_title": "店员看店",
+    "offline_duration_fmt": "离开 {duration}",
     "offline_gain_label": "店里多了",
     "offline_claim": "收下",
     "rate_fmt": "+{n}/分",
     "toast_sold": "卖掉了 {n} 杯",
     "toast_upgraded": "{name} 升到 Lv{n}",
-    "prestige_gate_fmt": "{cur} / 下一档 {next}"
+    "prestige_gate_fmt": "{cur} / 下一档 {next}",
+    "upgrade_effect_fmt": "{effect}"
   },
   "events_v05": [
     {
@@ -100,6 +102,164 @@
       "name": "探店",
       "copy": "有人拍照发了笔记，声望小涨。",
       "hint": "点击得少量声望"
+    }
+  ],
+  "upgrade_copy": [
+    {
+      "id": "tea_garden_1",
+      "name": "茶园 Lv1",
+      "effect_short": "茶叶+5/分",
+      "payback_short": "回本~5分"
+    },
+    {
+      "id": "tea_garden_2",
+      "name": "茶园 Lv2",
+      "effect_short": "茶叶+5/分",
+      "payback_short": "回本~7分"
+    },
+    {
+      "id": "tea_garden_3",
+      "name": "茶园 Lv3",
+      "effect_short": "茶叶+5/分",
+      "payback_short": "回本~9.5分"
+    },
+    {
+      "id": "tea_garden_4",
+      "name": "茶园 Lv4",
+      "effect_short": "茶叶+5/分",
+      "payback_short": "回本~13.2分"
+    },
+    {
+      "id": "tea_garden_5",
+      "name": "茶园 Lv5",
+      "effect_short": "茶叶+5/分",
+      "payback_short": "回本~18.2分"
+    },
+    {
+      "id": "tea_garden_6",
+      "name": "茶园 Lv6",
+      "effect_short": "茶叶+5/分",
+      "payback_short": "回本~25分"
+    },
+    {
+      "id": "tea_garden_7",
+      "name": "茶园 Lv7",
+      "effect_short": "茶叶+5/分",
+      "payback_short": "回本~34.5分"
+    },
+    {
+      "id": "tea_garden_8",
+      "name": "茶园 Lv8",
+      "effect_short": "茶叶+5/分",
+      "payback_short": "回本~47.8分"
+    },
+    {
+      "id": "tea_garden_9",
+      "name": "茶园 Lv9",
+      "effect_short": "茶叶+5/分",
+      "payback_short": "回本~65.8分"
+    },
+    {
+      "id": "tea_garden_10",
+      "name": "茶园 Lv10",
+      "effect_short": "茶叶+5/分",
+      "payback_short": "回本~90.8分"
+    },
+    {
+      "id": "brew_station_1",
+      "name": "调制台 Lv1",
+      "effect_short": "杯速+0.25",
+      "payback_short": "回本~4分"
+    },
+    {
+      "id": "brew_station_2",
+      "name": "调制台 Lv2",
+      "effect_short": "杯速+0.25",
+      "payback_short": "回本~5.5分"
+    },
+    {
+      "id": "brew_station_3",
+      "name": "调制台 Lv3",
+      "effect_short": "杯速+0.25",
+      "payback_short": "回本~7.5分"
+    },
+    {
+      "id": "brew_station_4",
+      "name": "调制台 Lv4",
+      "effect_short": "杯速+0.25",
+      "payback_short": "回本~10分"
+    },
+    {
+      "id": "brew_station_5",
+      "name": "调制台 Lv5",
+      "effect_short": "杯速+0.25",
+      "payback_short": "回本~13.5分"
+    },
+    {
+      "id": "brew_station_6",
+      "name": "调制台 Lv6",
+      "effect_short": "杯速+0.25",
+      "payback_short": "回本~18分"
+    },
+    {
+      "id": "brew_station_7",
+      "name": "调制台 Lv7",
+      "effect_short": "杯速+0.25",
+      "payback_short": "回本~24分"
+    },
+    {
+      "id": "brew_station_8",
+      "name": "调制台 Lv8",
+      "effect_short": "杯速+0.25",
+      "payback_short": "回本~32.5分"
+    },
+    {
+      "id": "stall_1",
+      "name": "摊位 Lv1",
+      "effect_short": "杯价提升",
+      "payback_short": "回本~25分"
+    },
+    {
+      "id": "stall_2",
+      "name": "摊位 Lv2",
+      "effect_short": "杯价提升",
+      "payback_short": "回本~34分"
+    },
+    {
+      "id": "stall_3",
+      "name": "摊位 Lv3",
+      "effect_short": "杯价提升",
+      "payback_short": "回本~48分"
+    },
+    {
+      "id": "stall_4",
+      "name": "摊位 Lv4",
+      "effect_short": "杯价提升",
+      "payback_short": "回本~66分"
+    },
+    {
+      "id": "stall_5",
+      "name": "摊位 Lv5",
+      "effect_short": "杯价提升",
+      "payback_short": "回本~91分"
+    },
+    {
+      "id": "stall_6",
+      "name": "摊位 Lv6",
+      "effect_short": "杯价提升",
+      "payback_short": "回本~125分"
+    },
+    {
+      "id": "stall_7",
+      "name": "摊位 Lv7",
+      "effect_short": "杯价提升",
+      "payback_short": "回本~173分"
+    },
+    {
+      "id": "stall_8",
+      "name": "摊位 Lv8",
+      "effect_short": "杯价提升",
+      "payback_short": "回本~238分"
     }
   ]
 }

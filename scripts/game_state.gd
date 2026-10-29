@@ -304,3 +304,13 @@ func content_resource(key: String) -> Dictionary:
 		if str(r.get("key", "")) == key:
 			return r
 	return {}
+
+func content_upgrade_copy(id: String) -> Dictionary:
+	var arr = _content.get("upgrade_copy", [])
+	if typeof(arr) != TYPE_ARRAY:
+		return {}
+	for u in arr:
+		if str(u.get("id", "")) == id:
+			return u
+	return {}
+

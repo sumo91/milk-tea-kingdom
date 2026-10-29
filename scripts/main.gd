@@ -56,7 +56,7 @@ func _process(delta: float) -> void:
 	lbl_prod.text = "%.0f / %.0f   调制 %.2f杯/分" % [GameState.product, GameState.product_cap, GameState.brew_cycles_per_min()]
 	lbl_gold.text = "%.0f 金" % GameState.gold
 	var gate := GameState.next_prestige_gate()
-	lbl_prestige.text = "%.0f / 下一档 %.0f" % [GameState.prestige, gate]
+	lbl_prestige.text = GameState.ui_fmt("prestige_gate_fmt", "{cur} / 下一档 {next}", {"cur": "%.0f" % GameState.prestige, "next": "%.0f" % gate})
 	if bar_ing:
 		bar_ing.max_value = maxf(GameState.ingredient_cap, 1.0)
 		bar_ing.value = GameState.ingredient
@@ -235,7 +235,7 @@ func _build_ui() -> void:
 	sell.pressed.connect(_on_sell_pressed)
 	root.add_child(sell)
 	var hint := Label.new()
-	hint.text = "摊位已开张：杯装会自动换成金币和声望（也可手动卖）"
+	hint.text = str(GameState.content_building("stall").get("short_desc", "自动卖"))
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_ink_label(hint, 12, true)
 	root.add_child(hint)
@@ -466,25 +466,28 @@ func _rebuild_stations() -> void:
 		name_l.text = "%s  ·  %s" % [disp_name, GameState.ui_fmt("level_fmt", "Lv{n}", {"n": lv})]
 		_ink_label(name_l, 17)
 		col.add_child(name_l)
+		var short_l := Label.new()
+		var short := str(cb.get("short_desc", ""))
+		if short == "":
+			short = str(cb.get("line_hint", ""))
+		short_l.text = short
+		_ink_label(short_l, 13, true)
+		col.add_child(short_l)
 		var st := Label.new()
 		if unlocked:
 			match id:
 				"tea_garden":
 					st.text = GameState.ui_fmt("rate_fmt", "+{n}/分", {"n": "%.1f" % GameState.ingredient_rate()})
 				"brew_station":
-					st.text = GameState.ui_fmt("rate_fmt", "+{n}/分", {"n": "%.2f 杯" % GameState.brew_cycles_per_min()})
+					st.text = GameState.ui_fmt("rate_fmt", "+{n}/分", {"n": "%.2f" % GameState.brew_cycles_per_min()})
 				"stall":
-					st.text = "自动卖 · 每杯 %.0f 金" % GameState.gold_per_cup
+					st.text = GameState.ui_fmt("rate_fmt", "+{n}/分", {"n": "%.0f金/杯" % GameState.gold_per_cup})
 				_:
-					st.text = str(cb.get("line_hint", "已解锁"))
+					st.text = str(cb.get("line_hint", ""))
 		else:
 			var need := int(b.get("unlock_prestige", cb.get("unlock_prestige", 0)))
-			var copy := str(cb.get("unlock_copy", ""))
-			if copy != "":
-				st.text = copy
-			else:
-				st.text = GameState.ui_fmt("locked_fmt", "声望 {n} 解锁", {"n": need})
-		_ink_label(st, 14, true)
+			st.text = GameState.ui_fmt("locked_fmt", "声望{n}", {"n": need})
+		_ink_label(st, 13, true)
 		col.add_child(st)
 		card.modulate = Color(1, 1, 1, 1) if unlocked else Color(1, 1, 1, 0.55)
 		line_box.add_child(card)
@@ -522,18 +525,25 @@ func _rebuild_upgrades() -> void:
 		var info := VBoxContainer.new()
 		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(info)
+		var uc: Dictionary = GameState.content_upgrade_copy(id)
 		var name_l := Label.new()
-		name_l.text = str(u.get("name", id))
+		name_l.text = str(uc.get("name", u.get("name", id)))
 		_ink_label(name_l, 16)
 		info.add_child(name_l)
+		var eff := Label.new()
+		var effect := str(uc.get("effect_short", ""))
+		if effect == "":
+			effect = GameState.ui_fmt("upgrade_effect_fmt", "{effect}", {"effect": str(u.get("name", ""))})
+		eff.text = effect
+		_ink_label(eff, 12, true)
+		info.add_child(eff)
 		var pay := Label.new()
-		pay.text = GameState.ui_fmt("payback_fmt", "回本 ~{min} 分钟", {"min": u.get("payback_min_hint", "?")})
+		var pb := str(uc.get("payback_short", ""))
+		if pb == "":
+			pb = GameState.ui_fmt("payback_fmt", "回本~{min}分", {"min": u.get("payback_min_hint", "?")})
+		pay.text = "%s · %.0f金" % [pb, float(u.get("cost_gold", 0))]
 		_ink_label(pay, 12, true)
 		info.add_child(pay)
-		var cost_l := Label.new()
-		cost_l.text = "花费 %.0f 金" % float(u.get("cost_gold", 0))
-		_ink_label(cost_l, 13, true)
-		info.add_child(cost_l)
 		var btn := Button.new()
 		btn.text = GameState.ui_string("upgrade_btn", "升级")
 		btn.custom_minimum_size = Vector2(112, 48)
