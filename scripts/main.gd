@@ -156,10 +156,10 @@ func _panel(parent: Control) -> PanelContainer:
 	sb.corner_radius_top_right = 12
 	sb.corner_radius_bottom_left = 12
 	sb.corner_radius_bottom_right = 12
-	sb.content_margin_left = 12
-	sb.content_margin_right = 12
-	sb.content_margin_top = 10
-	sb.content_margin_bottom = 10
+	sb.content_margin_left = 10
+	sb.content_margin_right = 10
+	sb.content_margin_top = 6
+	sb.content_margin_bottom = 6
 	p.add_theme_stylebox_override("panel", sb)
 	parent.add_child(p)
 	return p
@@ -185,7 +185,7 @@ func _build_ui() -> void:
 	margin.add_theme_constant_override("margin_left", 24)
 	margin.add_theme_constant_override("margin_top", 48)
 	margin.add_theme_constant_override("margin_right", 24)
-	margin.add_theme_constant_override("margin_bottom", 42)
+	margin.add_theme_constant_override("margin_bottom", 56)
 	add_child(margin)
 
 	var row := HBoxContainer.new()
@@ -203,7 +203,7 @@ func _build_ui() -> void:
 	page_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	row.add_child(page_scroll)
 	var root := VBoxContainer.new()
-	root.add_theme_constant_override("separation", 8)
+	root.add_theme_constant_override("separation", 6)
 	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.custom_minimum_size = Vector2(0, 0)
 	page_scroll.add_child(root)
@@ -217,7 +217,7 @@ func _build_ui() -> void:
 	var title := Label.new()
 	title.text = GameState.ui_string("title", GameState.content_title())
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_ink_label(title, 26)
+	_ink_label(title, 24)
 	root.add_child(title)
 
 	toast_label = Label.new()
@@ -245,7 +245,7 @@ func _build_ui() -> void:
 	_ink_label(lbl_prestige, 13, true)
 	pr_row.add_child(lbl_prestige)
 	bar_prestige = TextureProgressBar.new()
-	bar_prestige.custom_minimum_size = Vector2(0, 14)
+	bar_prestige.custom_minimum_size = Vector2(0, 10)
 	bar_prestige.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar_prestige.texture_under = _tex(MAIN + "UI_BAR_BG_temp.png")
 	bar_prestige.texture_progress = _tex(MAIN + "UI_BAR_FILL_PRESTIGE_temp.png")
@@ -254,7 +254,7 @@ func _build_ui() -> void:
 
 	# Three resource tracks stacked (~18%)
 	var tracks := VBoxContainer.new()
-	tracks.add_theme_constant_override("separation", 6)
+	tracks.add_theme_constant_override("separation", 4)
 	root.add_child(tracks)
 	var t_ing := _make_track(tracks, str(GameState.content_resource("ingredient").get("name", "茶叶")), ICON + "UI_ICON_INGREDIENT_temp.png", MAIN + "UI_BAR_FILL_INGREDIENT_temp.png")
 	lbl_ing = t_ing["label"]
@@ -266,14 +266,14 @@ func _build_ui() -> void:
 
 	# Stations vertical (~32%) — each station is its own card
 	var line_col := VBoxContainer.new()
-	line_col.add_theme_constant_override("separation", 6)
+	line_col.add_theme_constant_override("separation", 4)
 	root.add_child(line_col)
 	var lt := Label.new()
 	lt.text = GameState.ui_string("line_title", "产线")
 	_ink_label(lt, 18)
 	line_col.add_child(lt)
 	line_box = VBoxContainer.new()
-	line_box.add_theme_constant_override("separation", 6)
+	line_box.add_theme_constant_override("separation", 4)
 	line_col.add_child(line_box)
 
 	var sell := Button.new()
@@ -291,6 +291,7 @@ func _build_ui() -> void:
 
 	# Upgrades: live in page scroll so ≥2 cards reachable; keep bottom safe margin
 	var up_wrap := _panel(root)
+	up_wrap.custom_minimum_size = Vector2(0, 200)
 	var up_col := VBoxContainer.new()
 	up_col.add_theme_constant_override("separation", 8)
 	up_wrap.add_child(up_col)
@@ -401,7 +402,7 @@ func _build_offline_modal() -> void:
 func _make_track(parent: Control, title: String, icon_path: String, fill_path: String) -> Dictionary:
 	var wrap := _panel(parent)
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 4)
+	box.add_theme_constant_override("separation", 2)
 	wrap.add_child(box)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
@@ -409,8 +410,8 @@ func _make_track(parent: Control, title: String, icon_path: String, fill_path: S
 	if icon_path != "":
 		var icon := TextureRect.new()
 		icon.texture = _tex(icon_path)
-		icon.custom_minimum_size = Vector2(48, 48)
-		icon.size = Vector2(48, 48)
+		icon.custom_minimum_size = Vector2(40, 40)
+		icon.size = Vector2(40, 40)
 		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -427,7 +428,7 @@ func _make_track(parent: Control, title: String, icon_path: String, fill_path: S
 	bar.nine_patch_stretch = true
 	bar.texture_under = _tex(MAIN + "UI_BAR_BG_temp.png")
 	bar.texture_progress = _tex(fill_path)
-	bar.custom_minimum_size = Vector2(0, 36)
+	bar.custom_minimum_size = Vector2(0, 28)
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_child(bar)
 	var lab := Label.new()
@@ -447,8 +448,8 @@ func _make_gold_track(parent: Control) -> Label:
 	box.add_child(row)
 	var icon := TextureRect.new()
 	icon.texture = _tex(ICON + "UI_ICON_GOLD_temp.png")
-	icon.custom_minimum_size = Vector2(48, 48)
-	icon.size = Vector2(48, 48)
+	icon.custom_minimum_size = Vector2(40, 40)
+	icon.size = Vector2(40, 40)
 	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -480,7 +481,7 @@ func _rebuild_stations() -> void:
 		if id == "seal":
 			continue
 		var card := PanelContainer.new()
-		card.custom_minimum_size = Vector2(0, 84)
+		card.custom_minimum_size = Vector2(0, 72)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var csb := StyleBoxFlat.new()
 		csb.bg_color = Color("FFF3E8")
@@ -493,10 +494,10 @@ func _rebuild_stations() -> void:
 		csb.border_width_right = 1
 		csb.border_width_bottom = 1
 		csb.border_color = Color("EDE4D7")
-		csb.content_margin_left = 12
-		csb.content_margin_right = 12
-		csb.content_margin_top = 10
-		csb.content_margin_bottom = 10
+		csb.content_margin_left = 10
+		csb.content_margin_right = 10
+		csb.content_margin_top = 6
+		csb.content_margin_bottom = 6
 		card.add_theme_stylebox_override("panel", csb)
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 12)
