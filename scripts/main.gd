@@ -1,5 +1,5 @@
 extends Control
-const UI_BUILD := "stall-wide-1"
+const UI_BUILD := "skin-inset-1"
 ## V0-M main HUD @ 720×1280 portrait — Idle美术 wireframe + portrait panel skin.
 
 const ICON := "res://assets/ui/idle/icons/"
@@ -189,21 +189,14 @@ func _panel(parent: Control) -> PanelContainer:
 
 func _build_ui() -> void:
 	# Portrait 720×1280: 竖屏主底板（勿叠横版 UI_PANEL_MAIN_temp）
+	# Full-bleed page tint only (not measured as content gutter)
 	var page := ColorRect.new()
 	page.color = Color("FFFAF5")
 	page.set_anchors_preset(Control.PRESET_FULL_RECT)
 	page.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(page)
 
-	var skin := TextureRect.new()
-	skin.texture = _tex(MAIN + "UI_PANEL_MAIN_portrait_temp.png")
-	skin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	skin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	skin.stretch_mode = TextureRect.STRETCH_SCALE
-	skin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(skin)
-
-	# Insets via anchors/offsets (survive min-size pressure better than MarginContainer)
+	# Shared inset root: skin + HUD share 24/48/24/56 so gutters are visible
 	var margin := Control.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	margin.offset_left = 24
@@ -213,6 +206,14 @@ func _build_ui() -> void:
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(margin)
 	_ui_margin = margin
+
+	var skin := TextureRect.new()
+	skin.texture = _tex(MAIN + "UI_PANEL_MAIN_portrait_temp.png")
+	skin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	skin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	skin.stretch_mode = TextureRect.STRETCH_SCALE
+	skin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.add_child(skin)
 
 	# Center column ≤720: top fixed + upgrade ScrollContainer
 	var row := HBoxContainer.new()
