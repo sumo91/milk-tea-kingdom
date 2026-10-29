@@ -1,0 +1,30 @@
+; Engine configuration file.
+; Godot 4.x — milk-tea-kingdom idle MVP scaffold
+config_version=5
+
+[application]
+
+config/name="奶茶王国放置"
+config/description="Idle / 放置 MVP：计时、离线、JSON 存档、表驱动升级"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "Forward Plus")
+
+[autoload]
+
+FlightDeckProbe="*res://addons/flight_deck/runtime_probe.gd"
+GameState="*res://scripts/game_state.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/flight_deck/plugin.cfg")

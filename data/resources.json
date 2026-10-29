@@ -1,0 +1,28 @@
+{
+  "ingredient": {
+    "key": "ingredient",
+    "label": "茶叶",
+    "hard_cap": 120,
+    "start": 20
+  },
+  "product": {
+    "key": "product",
+    "label": "杯装奶茶",
+    "hard_cap": 60,
+    "start": 0
+  },
+  "gold": {
+    "key": "gold",
+    "label": "金币",
+    "hard_cap": null,
+    "start": 50
+  },
+  "prestige": {
+    "key": "prestige",
+    "label": "声望",
+    "hard_cap": null,
+    "start": 0,
+    "next_unlock": 40,
+    "_note": "V0-Q: 40 暂不锁卖出；HUD「下一档」留给后续内容闸"
+  }
+}

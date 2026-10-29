@@ -1,0 +1,105 @@
+{
+  "theme_id": "milk_tea",
+  "theme_title": "奶茶王国",
+  "notes": "V0-Q: HUD 挂 short_desc/unlock_copy/ui_strings；摊位 unlock 与 buildings 对齐为 0（开局自动卖）。",
+  "resources": [
+    {
+      "key": "ingredient",
+      "name": "茶叶",
+      "icon_hint": "茶叶堆",
+      "color": "green",
+      "short": "原料"
+    },
+    {
+      "key": "product",
+      "name": "杯装奶茶",
+      "icon_hint": "封口杯",
+      "color": "orange",
+      "short": "成品"
+    },
+    {
+      "key": "gold",
+      "name": "金币",
+      "icon_hint": "硬币",
+      "color": "yellow",
+      "short": "营收"
+    },
+    {
+      "key": "prestige",
+      "name": "声望",
+      "icon_hint": "小徽章",
+      "color": "purple",
+      "short": "口碑"
+    }
+  ],
+  "buildings": [
+    {
+      "id": "tea_garden",
+      "name": "茶园",
+      "unlock_prestige": 0,
+      "unlock_copy": "",
+      "icon_asset": "UI_ICON_STATION_SHELF",
+      "icon_hint": "茶垄/茶叶货架",
+      "short_desc": "采茶叶 · 原料仓",
+      "line_hint": "茶叶堆在涨"
+    },
+    {
+      "id": "brew_station",
+      "name": "调制台",
+      "unlock_prestige": 0,
+      "unlock_copy": "",
+      "icon_asset": "UI_ICON_STATION_BREW",
+      "icon_hint": "摇杯/煮茶灶",
+      "short_desc": "10 叶 → 1 杯",
+      "line_hint": "摇出杯装奶茶"
+    },
+    {
+      "id": "stall",
+      "name": "摊位",
+      "unlock_prestige": 0,
+      "unlock_copy": "摊位已开张：杯装会自动卖成金币和声望。",
+      "icon_asset": "UI_ICON_STATION_STALL",
+      "icon_hint": "奶茶摊位",
+      "short_desc": "自动卖杯换金",
+      "line_hint": "客人来了就卖"
+    }
+  ],
+  "ui_strings": {
+    "title": "奶茶王国",
+    "line_title": "产线",
+    "upgrade_title": "升级",
+    "upgrade_btn": "升级",
+    "sell_all": "卖出全部奶茶",
+    "locked_fmt": "声望 {n} 解锁",
+    "level_fmt": "Lv{n}",
+    "payback_fmt": "回本 ~{min} 分钟",
+    "offline_title": "店员帮你看店",
+    "offline_duration_fmt": "离开了 {duration}",
+    "offline_gain_label": "店里多了",
+    "offline_claim": "收下",
+    "rate_fmt": "+{n}/分",
+    "toast_sold": "卖掉了 {n} 杯",
+    "toast_upgraded": "{name} 升到 Lv{n}",
+    "prestige_gate_fmt": "{cur} / 下一档 {next}"
+  },
+  "events_v05": [
+    {
+      "id": "rush_hour",
+      "name": "下班潮",
+      "copy": "写字楼散场了，杯装一时紧俏。",
+      "hint": "短时抬卖出效率"
+    },
+    {
+      "id": "tea_shortage",
+      "name": "茶叶紧俏",
+      "copy": "供应商晚点了，茶园得加把劲。",
+      "hint": "短时降茶叶产速或点一下恢复"
+    },
+    {
+      "id": "foodie_visit",
+      "name": "探店",
+      "copy": "有人拍照发了笔记，声望小涨。",
+      "hint": "点击得少量声望"
+    }
+  ]
+}

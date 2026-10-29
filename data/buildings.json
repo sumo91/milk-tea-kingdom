@@ -1,0 +1,35 @@
+{
+  "unit": "per_min",
+  "_source": "v0_balance_draft.json",
+  "buildings": [
+    {
+      "id": "tea_garden",
+      "name": "茶园",
+      "unlock_prestige": 0,
+      "key_produces": "ingredient",
+      "base_rate_per_min": 10,
+      "base_cap": 120
+    },
+    {
+      "id": "brew_station",
+      "name": "调制台",
+      "unlock_prestige": 0,
+      "key_produces": "product",
+      "ratio_in": 10,
+      "ratio_out": 1,
+      "base_cycles_per_min": 1.0,
+      "base_cap": 60
+    },
+    {
+      "id": "stall",
+      "name": "摊位",
+      "unlock_prestige": 0,
+      "key_produces": "gold",
+      "ratio_in": 1,
+      "ratio_out": 8,
+      "auto_sell": true,
+      "_note": "V0-Q: 开局自动卖；声望改作后续内容闸，不再锁卖出"
+    }
+  ],
+  "_v0q": "2026-10-30 open auto-sell: stall unlock_prestige 0"
+}

@@ -1,0 +1,214 @@
+{
+  "unit": "per_min",
+  "source": "data/v0_balance_draft.json",
+  "upgrades": [
+    {
+      "id": "tea_garden_1",
+      "building_id": "tea_garden",
+      "name": "茶园 → Lv1",
+      "cost_gold": 20,
+      "to_level": 1,
+      "payback_min_hint": 5.0
+    },
+    {
+      "id": "tea_garden_2",
+      "building_id": "tea_garden",
+      "name": "茶园 → Lv2",
+      "cost_gold": 28,
+      "to_level": 2,
+      "payback_min_hint": 7.0
+    },
+    {
+      "id": "tea_garden_3",
+      "building_id": "tea_garden",
+      "name": "茶园 → Lv3",
+      "cost_gold": 38,
+      "to_level": 3,
+      "payback_min_hint": 9.5
+    },
+    {
+      "id": "tea_garden_4",
+      "building_id": "tea_garden",
+      "name": "茶园 → Lv4",
+      "cost_gold": 53,
+      "to_level": 4,
+      "payback_min_hint": 13.2
+    },
+    {
+      "id": "tea_garden_5",
+      "building_id": "tea_garden",
+      "name": "茶园 → Lv5",
+      "cost_gold": 73,
+      "to_level": 5,
+      "payback_min_hint": 18.2
+    },
+    {
+      "id": "tea_garden_6",
+      "building_id": "tea_garden",
+      "name": "茶园 → Lv6",
+      "cost_gold": 100,
+      "to_level": 6,
+      "payback_min_hint": 25.0
+    },
+    {
+      "id": "tea_garden_7",
+      "building_id": "tea_garden",
+      "name": "茶园 → Lv7",
+      "cost_gold": 138,
+      "to_level": 7,
+      "payback_min_hint": 34.5
+    },
+    {
+      "id": "tea_garden_8",
+      "building_id": "tea_garden",
+      "name": "茶园 → Lv8",
+      "cost_gold": 191,
+      "to_level": 8,
+      "payback_min_hint": 47.8
+    },
+    {
+      "id": "tea_garden_9",
+      "building_id": "tea_garden",
+      "name": "茶园 → Lv9",
+      "cost_gold": 263,
+      "to_level": 9,
+      "payback_min_hint": 65.8
+    },
+    {
+      "id": "tea_garden_10",
+      "building_id": "tea_garden",
+      "name": "茶园 → Lv10",
+      "cost_gold": 363,
+      "to_level": 10,
+      "payback_min_hint": 90.8
+    },
+    {
+      "id": "brew_station_1",
+      "building_id": "brew_station",
+      "name": "调制台 → Lv1",
+      "cost_gold": 8,
+      "to_level": 1,
+      "payback_min_hint": 4.0
+    },
+    {
+      "id": "brew_station_2",
+      "building_id": "brew_station",
+      "name": "调制台 → Lv2",
+      "cost_gold": 11,
+      "to_level": 2,
+      "payback_min_hint": 5.5
+    },
+    {
+      "id": "brew_station_3",
+      "building_id": "brew_station",
+      "name": "调制台 → Lv3",
+      "cost_gold": 15,
+      "to_level": 3,
+      "payback_min_hint": 7.5
+    },
+    {
+      "id": "brew_station_4",
+      "building_id": "brew_station",
+      "name": "调制台 → Lv4",
+      "cost_gold": 20,
+      "to_level": 4,
+      "payback_min_hint": 10.0
+    },
+    {
+      "id": "brew_station_5",
+      "building_id": "brew_station",
+      "name": "调制台 → Lv5",
+      "cost_gold": 27,
+      "to_level": 5,
+      "payback_min_hint": 13.5
+    },
+    {
+      "id": "brew_station_6",
+      "building_id": "brew_station",
+      "name": "调制台 → Lv6",
+      "cost_gold": 36,
+      "to_level": 6,
+      "payback_min_hint": 18.0
+    },
+    {
+      "id": "brew_station_7",
+      "building_id": "brew_station",
+      "name": "调制台 → Lv7",
+      "cost_gold": 48,
+      "to_level": 7,
+      "payback_min_hint": 24.0
+    },
+    {
+      "id": "brew_station_8",
+      "building_id": "brew_station",
+      "name": "调制台 → Lv8",
+      "cost_gold": 65,
+      "to_level": 8,
+      "payback_min_hint": 32.5
+    },
+    {
+      "id": "stall_1",
+      "building_id": "stall",
+      "name": "摊位售价 → Lv1",
+      "cost_gold": 25,
+      "to_level": 1,
+      "payback_min_hint": 25.0
+    },
+    {
+      "id": "stall_2",
+      "building_id": "stall",
+      "name": "摊位售价 → Lv2",
+      "cost_gold": 34,
+      "to_level": 2,
+      "payback_min_hint": 34.0
+    },
+    {
+      "id": "stall_3",
+      "building_id": "stall",
+      "name": "摊位售价 → Lv3",
+      "cost_gold": 48,
+      "to_level": 3,
+      "payback_min_hint": 48.0
+    },
+    {
+      "id": "stall_4",
+      "building_id": "stall",
+      "name": "摊位售价 → Lv4",
+      "cost_gold": 66,
+      "to_level": 4,
+      "payback_min_hint": 66.0
+    },
+    {
+      "id": "stall_5",
+      "building_id": "stall",
+      "name": "摊位售价 → Lv5",
+      "cost_gold": 91,
+      "to_level": 5,
+      "payback_min_hint": 91.0
+    },
+    {
+      "id": "stall_6",
+      "building_id": "stall",
+      "name": "摊位售价 → Lv6",
+      "cost_gold": 125,
+      "to_level": 6,
+      "payback_min_hint": 125.0
+    },
+    {
+      "id": "stall_7",
+      "building_id": "stall",
+      "name": "摊位售价 → Lv7",
+      "cost_gold": 173,
+      "to_level": 7,
+      "payback_min_hint": 173.0
+    },
+    {
+      "id": "stall_8",
+      "building_id": "stall",
+      "name": "摊位售价 → Lv8",
+      "cost_gold": 238,
+      "to_level": 8,
+      "payback_min_hint": 238.0
+    }
+  ]
+}

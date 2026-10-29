@@ -1,0 +1,283 @@
+{
+  "version": "V0-Q-autosell",
+  "assumptions": {
+    "theme": "奶茶王国",
+    "units": "全部速率用 /分；金币/声望为存量",
+    "convert": "10 茶叶 → 1 杯装奶茶；1 杯装 → 8 金币",
+    "offline_factor": 0.7,
+    "payback_targets": "茶园/调制台首档 3–5 分，中段 15–30 分；摊位偏中后期沉没",
+    "prestige_gain": "每卖出 1 杯装 +1 声望（不做硬重置）",
+    "out_of_scope_v0": "硬货币、四国换皮、重置、事件数值",
+    "prestige_gates": "茶园+调制台+摊位均开局可用（自动卖）；声望40起为后续内容闸，不锁卖出。",
+    "deadlock_fix": "2026-10-29：调制台40锁已改为开局可调制。2026-10-30 V0-Q：摊位改 unlock 0，开局自动卖。",
+    "v0q_auto_sell": "开局自动卖；手动出售按钮可保留作冗余。"
+  },
+  "resources": [
+    {
+      "key": "ingredient",
+      "label": "茶叶",
+      "has_cap": true
+    },
+    {
+      "key": "product",
+      "label": "杯装奶茶",
+      "has_cap": true
+    },
+    {
+      "key": "gold",
+      "label": "金币",
+      "has_cap": false
+    },
+    {
+      "key": "prestige",
+      "label": "声望",
+      "role": "unlock_gate_only"
+    }
+  ],
+  "buildings": [
+    {
+      "id": "tea_garden",
+      "name": "茶园",
+      "unlock_prestige": 0,
+      "key_produces": "ingredient",
+      "base_rate_per_min": 10,
+      "base_cap": 120
+    },
+    {
+      "id": "brew_station",
+      "name": "调制台",
+      "unlock_prestige": 0,
+      "key_produces": "product",
+      "ratio_in": 10,
+      "ratio_out": 1,
+      "base_cycles_per_min": 1.0,
+      "base_cap": 60
+    },
+    {
+      "id": "stall",
+      "name": "摊位",
+      "unlock_prestige": 0,
+      "key_produces": "gold",
+      "ratio_in": 1,
+      "ratio_out": 8,
+      "auto_sell": true
+    }
+  ],
+  "upgrades": {
+    "tea_garden": [
+      {
+        "to_level": 1,
+        "cost_gold": 20,
+        "delta_ingredient_per_min": 5,
+        "rate_after": 15,
+        "payback_min": 5.0
+      },
+      {
+        "to_level": 2,
+        "cost_gold": 28,
+        "delta_ingredient_per_min": 5,
+        "rate_after": 20,
+        "payback_min": 7.0
+      },
+      {
+        "to_level": 3,
+        "cost_gold": 38,
+        "delta_ingredient_per_min": 5,
+        "rate_after": 25,
+        "payback_min": 9.5
+      },
+      {
+        "to_level": 4,
+        "cost_gold": 53,
+        "delta_ingredient_per_min": 5,
+        "rate_after": 30,
+        "payback_min": 13.2
+      },
+      {
+        "to_level": 5,
+        "cost_gold": 73,
+        "delta_ingredient_per_min": 5,
+        "rate_after": 35,
+        "payback_min": 18.2
+      },
+      {
+        "to_level": 6,
+        "cost_gold": 100,
+        "delta_ingredient_per_min": 5,
+        "rate_after": 40,
+        "payback_min": 25.0
+      },
+      {
+        "to_level": 7,
+        "cost_gold": 138,
+        "delta_ingredient_per_min": 5,
+        "rate_after": 45,
+        "payback_min": 34.5
+      },
+      {
+        "to_level": 8,
+        "cost_gold": 191,
+        "delta_ingredient_per_min": 5,
+        "rate_after": 50,
+        "payback_min": 47.8
+      },
+      {
+        "to_level": 9,
+        "cost_gold": 263,
+        "delta_ingredient_per_min": 5,
+        "rate_after": 55,
+        "payback_min": 65.8
+      },
+      {
+        "to_level": 10,
+        "cost_gold": 363,
+        "delta_ingredient_per_min": 5,
+        "rate_after": 60,
+        "payback_min": 90.8
+      }
+    ],
+    "brew_station": [
+      {
+        "to_level": 1,
+        "cost_gold": 8,
+        "delta_cycles_per_min": 0.25,
+        "cycles_after": 1.25,
+        "payback_min": 4.0
+      },
+      {
+        "to_level": 2,
+        "cost_gold": 11,
+        "delta_cycles_per_min": 0.25,
+        "cycles_after": 1.5,
+        "payback_min": 5.5
+      },
+      {
+        "to_level": 3,
+        "cost_gold": 15,
+        "delta_cycles_per_min": 0.25,
+        "cycles_after": 1.75,
+        "payback_min": 7.5
+      },
+      {
+        "to_level": 4,
+        "cost_gold": 20,
+        "delta_cycles_per_min": 0.25,
+        "cycles_after": 2.0,
+        "payback_min": 10.0
+      },
+      {
+        "to_level": 5,
+        "cost_gold": 27,
+        "delta_cycles_per_min": 0.25,
+        "cycles_after": 2.25,
+        "payback_min": 13.5
+      },
+      {
+        "to_level": 6,
+        "cost_gold": 36,
+        "delta_cycles_per_min": 0.25,
+        "cycles_after": 2.5,
+        "payback_min": 18.0
+      },
+      {
+        "to_level": 7,
+        "cost_gold": 48,
+        "delta_cycles_per_min": 0.25,
+        "cycles_after": 2.75,
+        "payback_min": 24.0
+      },
+      {
+        "to_level": 8,
+        "cost_gold": 65,
+        "delta_cycles_per_min": 0.25,
+        "cycles_after": 3.0,
+        "payback_min": 32.5
+      }
+    ],
+    "stall": [
+      {
+        "to_level": 1,
+        "cost_gold": 25,
+        "delta_gold_per_cup": 1,
+        "price_after": 9,
+        "payback_min_at_1_cup_per_min": 25.0,
+        "payback_min_at_2_cup_per_min": 12.5
+      },
+      {
+        "to_level": 2,
+        "cost_gold": 34,
+        "delta_gold_per_cup": 1,
+        "price_after": 10,
+        "payback_min_at_1_cup_per_min": 34.0,
+        "payback_min_at_2_cup_per_min": 17.0
+      },
+      {
+        "to_level": 3,
+        "cost_gold": 48,
+        "delta_gold_per_cup": 1,
+        "price_after": 11,
+        "payback_min_at_1_cup_per_min": 48.0,
+        "payback_min_at_2_cup_per_min": 24.0
+      },
+      {
+        "to_level": 4,
+        "cost_gold": 66,
+        "delta_gold_per_cup": 1,
+        "price_after": 12,
+        "payback_min_at_1_cup_per_min": 66.0,
+        "payback_min_at_2_cup_per_min": 33.0
+      },
+      {
+        "to_level": 5,
+        "cost_gold": 91,
+        "delta_gold_per_cup": 1,
+        "price_after": 13,
+        "payback_min_at_1_cup_per_min": 91.0,
+        "payback_min_at_2_cup_per_min": 45.5
+      },
+      {
+        "to_level": 6,
+        "cost_gold": 125,
+        "delta_gold_per_cup": 1,
+        "price_after": 14,
+        "payback_min_at_1_cup_per_min": 125.0,
+        "payback_min_at_2_cup_per_min": 62.5
+      },
+      {
+        "to_level": 7,
+        "cost_gold": 173,
+        "delta_gold_per_cup": 1,
+        "price_after": 15,
+        "payback_min_at_1_cup_per_min": 173.0,
+        "payback_min_at_2_cup_per_min": 86.5
+      },
+      {
+        "to_level": 8,
+        "cost_gold": 238,
+        "delta_gold_per_cup": 1,
+        "price_after": 16,
+        "payback_min_at_1_cup_per_min": 238.0,
+        "payback_min_at_2_cup_per_min": 119.0
+      }
+    ]
+  },
+  "prestige_gates": [
+    {
+      "prestige": 0,
+      "unlocks": "tea_garden"
+    },
+    {
+      "prestige": 40,
+      "unlocks": "brew_station"
+    },
+    {
+      "prestige": 0,
+      "unlocks": "stall",
+      "note": "V0-Q open auto-sell"
+    },
+    {
+      "prestige": 200,
+      "unlocks": "cap_boost_tier1"
+    }
+  ]
+}
