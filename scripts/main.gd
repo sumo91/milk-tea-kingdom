@@ -204,19 +204,19 @@ func _build_ui() -> void:
 	bar_prod = t_prod["bar"]
 	lbl_gold = _make_gold_track(tracks)
 
-	# Stations vertical (~32%)
-	var line_wrap := _panel(root)
-	line_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	line_wrap.size_flags_stretch_ratio = 0.9
+	# Stations vertical (~32%) — each station is its own card
 	var line_col := VBoxContainer.new()
 	line_col.add_theme_constant_override("separation", 8)
-	line_wrap.add_child(line_col)
+	line_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	line_col.size_flags_stretch_ratio = 0.9
+	root.add_child(line_col)
 	var lt := Label.new()
 	lt.text = GameState.ui_string("line_title", "产线")
 	_ink_label(lt, 18)
 	line_col.add_child(lt)
 	line_box = VBoxContainer.new()
-	line_box.add_theme_constant_override("separation", 10)
+	line_box.add_theme_constant_override("separation", 8)
+	line_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	line_col.add_child(line_box)
 
 	var sell := Button.new()
@@ -253,6 +253,25 @@ func _build_ui() -> void:
 	scroll.add_child(upgrade_box)
 
 	_build_offline_modal()
+
+
+func _make_plus_btn() -> Button:
+	var btn := Button.new()
+	btn.text = "+"
+	btn.custom_minimum_size = Vector2(48, 48)
+	btn.focus_mode = Control.FOCUS_NONE
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color("E8A0B0")
+	sb.corner_radius_top_left = 10
+	sb.corner_radius_top_right = 10
+	sb.corner_radius_bottom_left = 10
+	sb.corner_radius_bottom_right = 10
+	btn.add_theme_stylebox_override("normal", sb)
+	btn.add_theme_stylebox_override("hover", sb)
+	btn.add_theme_stylebox_override("pressed", sb)
+	btn.add_theme_color_override("font_color", Color("4A3728"))
+	btn.pressed.connect(func() -> void: _show_toast(GameState.ui_string("plus_soon", "扩容稍后开放")))
+	return btn
 
 
 func _style_primary_btn(btn: Button, enabled: bool) -> void:
@@ -350,12 +369,14 @@ func _make_track(parent: Control, title: String, icon_path: String, fill_path: S
 	bar.nine_patch_stretch = true
 	bar.texture_under = _tex(MAIN + "UI_BAR_BG_temp.png")
 	bar.texture_progress = _tex(fill_path)
-	bar.custom_minimum_size = Vector2(0, 36)
+	bar.custom_minimum_size = Vector2(0, 32)
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_child(bar)
 	var lab := Label.new()
 	_ink_label(lab, 15)
 	box.add_child(lab)
+	var plus := _make_plus_btn()
+	row.add_child(plus)
 	return {"label": lab, "bar": bar}
 
 func _make_gold_track(parent: Control) -> Label:
@@ -376,6 +397,8 @@ func _make_gold_track(parent: Control) -> Label:
 	name_l.text = str(GameState.content_resource("gold").get("name", "金币"))
 	_ink_label(name_l, 15)
 	row.add_child(name_l)
+	var plus := _make_plus_btn()
+	row.add_child(plus)
 	var lab := Label.new()
 	_ink_label(lab, 22)
 	box.add_child(lab)
@@ -393,34 +416,48 @@ func _rebuild_stations() -> void:
 	}
 	for b in GameState.get_buildings():
 		var id := str(b.get("id", ""))
+		if id == "seal":
+			continue
+		var card := PanelContainer.new()
+		card.custom_minimum_size = Vector2(0, 100)
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var csb := StyleBoxFlat.new()
+		csb.bg_color = Color("FFF3E8")
+		csb.corner_radius_top_left = 14
+		csb.corner_radius_top_right = 14
+		csb.corner_radius_bottom_left = 14
+		csb.corner_radius_bottom_right = 14
+		csb.border_width_left = 1
+		csb.border_width_top = 1
+		csb.border_width_right = 1
+		csb.border_width_bottom = 1
+		csb.border_color = Color("EDE4D7")
+		csb.content_margin_left = 12
+		csb.content_margin_right = 12
+		csb.content_margin_top = 10
+		csb.content_margin_bottom = 10
+		card.add_theme_stylebox_override("panel", csb)
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 12)
+		card.add_child(row)
 		var icon := TextureRect.new()
-		icon.texture = _tex(icon_map.get(id, ICON + "UI_ICON_STATION_SEAL_temp.png"))
+		icon.texture = _tex(icon_map.get(id, ICON + "UI_ICON_STATION_SHELF_temp.png"))
 		icon.custom_minimum_size = Vector2(64, 64)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		row.add_child(icon)
 		var col := VBoxContainer.new()
 		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		col.alignment = BoxContainer.ALIGNMENT_CENTER
 		row.add_child(col)
 		var unlocked := GameState.is_unlocked(id)
 		var lv := int(GameState.building_levels.get(id, 0))
 		var cb: Dictionary = GameState.content_building(id)
 		var disp_name := str(cb.get("name", b.get("name", "?")))
 		var name_l := Label.new()
-		name_l.text = GameState.ui_fmt("level_fmt", "Lv{n}", {"n": lv})
-		name_l.text = "%s  ·  %s" % [disp_name, name_l.text]
+		name_l.text = "%s  ·  %s" % [disp_name, GameState.ui_fmt("level_fmt", "Lv{n}", {"n": lv})]
 		_ink_label(name_l, 17)
 		col.add_child(name_l)
-		var desc := Label.new()
-		var short := str(cb.get("short_desc", ""))
-		if short != "":
-			desc.text = short
-		else:
-			desc.text = str(cb.get("line_hint", ""))
-		_ink_label(desc, 12, true)
-		col.add_child(desc)
 		var st := Label.new()
 		if unlocked:
 			match id:
@@ -439,10 +476,10 @@ func _rebuild_stations() -> void:
 				st.text = copy
 			else:
 				st.text = GameState.ui_fmt("locked_fmt", "声望 {n} 解锁", {"n": need})
-		_ink_label(st, 13, true)
+		_ink_label(st, 14, true)
 		col.add_child(st)
-		row.modulate = Color(1, 1, 1, 1) if unlocked else Color(1, 1, 1, 0.55)
-		line_box.add_child(row)
+		card.modulate = Color(1, 1, 1, 1) if unlocked else Color(1, 1, 1, 0.55)
+		line_box.add_child(card)
 
 func _rebuild_upgrades() -> void:
 	if upgrade_box == null:
@@ -452,13 +489,19 @@ func _rebuild_upgrades() -> void:
 	for u in GameState.get_upgrades():
 		var id := str(u.get("id", ""))
 		var card := PanelContainer.new()
+		card.custom_minimum_size = Vector2(0, 76)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var sb := StyleBoxFlat.new()
 		sb.bg_color = Color("FFF3E8")
-		sb.corner_radius_top_left = 10
-		sb.corner_radius_top_right = 10
-		sb.corner_radius_bottom_left = 10
-		sb.corner_radius_bottom_right = 10
+		sb.corner_radius_top_left = 14
+		sb.corner_radius_top_right = 14
+		sb.corner_radius_bottom_left = 14
+		sb.corner_radius_bottom_right = 14
+		sb.border_width_left = 1
+		sb.border_width_top = 1
+		sb.border_width_right = 1
+		sb.border_width_bottom = 1
+		sb.border_color = Color("EDE4D7")
 		sb.content_margin_left = 12
 		sb.content_margin_right = 12
 		sb.content_margin_top = 12
