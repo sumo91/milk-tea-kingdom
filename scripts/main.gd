@@ -188,6 +188,7 @@ func _build_ui() -> void:
 	margin.add_theme_constant_override("margin_bottom", 56)
 	add_child(margin)
 
+	# Center column ≤720: top fixed + upgrade ScrollContainer (must be able to scroll)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 0)
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -197,52 +198,54 @@ func _build_ui() -> void:
 	pad_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pad_l.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_child(pad_l)
-	var page_scroll := ScrollContainer.new()
-	page_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	page_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	page_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	row.add_child(page_scroll)
-	var root := VBoxContainer.new()
-	root.add_theme_constant_override("separation", 6)
-	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	root.custom_minimum_size = Vector2(0, 0)
-	page_scroll.add_child(root)
+
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 6)
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	row.add_child(col)
+	_ui_root = col
+
 	var pad_r := Control.new()
 	pad_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pad_r.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_child(pad_r)
-	_ui_root = root
 	_ui_pads = [pad_l, pad_r]
+
+	# --- fixed top (natural height, never EXPAND vertically) ---
+	var top := VBoxContainer.new()
+	top.add_theme_constant_override("separation", 4)
+	top.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	col.add_child(top)
 
 	var title := Label.new()
 	title.text = GameState.ui_string("title", GameState.content_title())
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_ink_label(title, 24)
-	root.add_child(title)
+	_ink_label(title, 22)
+	top.add_child(title)
 
 	toast_label = Label.new()
 	toast_label.visible = false
 	toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_ink_label(toast_label, 14)
+	_ink_label(toast_label, 13)
 	toast_label.add_theme_color_override("font_color", Color("3D9B4A"))
-	root.add_child(toast_label)
+	top.add_child(toast_label)
 
-	# Prestige thin bar under title (~10% band with title)
-	var pr_wrap := _panel(root)
+	var pr_wrap := _panel(top)
 	var pr_box := VBoxContainer.new()
-	pr_box.add_theme_constant_override("separation", 4)
+	pr_box.add_theme_constant_override("separation", 2)
 	pr_wrap.add_child(pr_box)
 	var pr_row := HBoxContainer.new()
 	pr_row.add_theme_constant_override("separation", 8)
 	pr_box.add_child(pr_row)
 	var pr_name := Label.new()
 	pr_name.text = str(GameState.content_resource("prestige").get("name", "声望"))
-	_ink_label(pr_name, 14)
+	_ink_label(pr_name, 13)
 	pr_row.add_child(pr_name)
 	lbl_prestige = Label.new()
 	lbl_prestige.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lbl_prestige.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_ink_label(lbl_prestige, 13, true)
+	_ink_label(lbl_prestige, 12, true)
 	pr_row.add_child(lbl_prestige)
 	bar_prestige = TextureProgressBar.new()
 	bar_prestige.custom_minimum_size = Vector2(0, 10)
@@ -252,10 +255,9 @@ func _build_ui() -> void:
 	bar_prestige.nine_patch_stretch = true
 	pr_box.add_child(bar_prestige)
 
-	# Three resource tracks stacked (~18%)
 	var tracks := VBoxContainer.new()
-	tracks.add_theme_constant_override("separation", 4)
-	root.add_child(tracks)
+	tracks.add_theme_constant_override("separation", 3)
+	top.add_child(tracks)
 	var t_ing := _make_track(tracks, str(GameState.content_resource("ingredient").get("name", "茶叶")), ICON + "UI_ICON_INGREDIENT_temp.png", MAIN + "UI_BAR_FILL_INGREDIENT_temp.png")
 	lbl_ing = t_ing["label"]
 	bar_ing = t_ing["bar"]
@@ -264,45 +266,51 @@ func _build_ui() -> void:
 	bar_prod = t_prod["bar"]
 	lbl_gold = _make_gold_track(tracks)
 
-	# Stations vertical (~32%) — each station is its own card
 	var line_col := VBoxContainer.new()
-	line_col.add_theme_constant_override("separation", 4)
-	root.add_child(line_col)
+	line_col.add_theme_constant_override("separation", 3)
+	top.add_child(line_col)
 	var lt := Label.new()
 	lt.text = GameState.ui_string("line_title", "产线")
-	_ink_label(lt, 18)
+	_ink_label(lt, 16)
 	line_col.add_child(lt)
 	line_box = VBoxContainer.new()
-	line_box.add_theme_constant_override("separation", 4)
+	line_box.add_theme_constant_override("separation", 3)
 	line_col.add_child(line_box)
 
 	var sell := Button.new()
 	sell.text = GameState.ui_string("sell_all", "卖出全部奶茶")
-	sell.custom_minimum_size = Vector2(0, 56)
+	sell.custom_minimum_size = Vector2(0, 52)
 	sell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_style_primary_btn(sell, true)
 	sell.pressed.connect(_on_sell_pressed)
-	root.add_child(sell)
-	var hint := Label.new()
-	hint.text = str(GameState.content_building("stall").get("short_desc", "自动卖"))
-	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_ink_label(hint, 12, true)
-	root.add_child(hint)
+	top.add_child(sell)
 
-	# Upgrades: live in page scroll so ≥2 cards reachable; keep bottom safe margin
-	var up_wrap := _panel(root)
-	up_wrap.custom_minimum_size = Vector2(0, 200)
+	# --- upgrades: dedicated scroll taking remaining height ---
+	var up_wrap := _panel(col)
+	up_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	up_wrap.size_flags_stretch_ratio = 1.0
+	up_wrap.custom_minimum_size = Vector2(0, 220)
 	var up_col := VBoxContainer.new()
-	up_col.add_theme_constant_override("separation", 8)
+	up_col.add_theme_constant_override("separation", 6)
+	up_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	up_wrap.add_child(up_col)
 	var ut := Label.new()
 	ut.text = GameState.ui_string("upgrade_title", "升级")
-	_ink_label(ut, 18)
+	_ink_label(ut, 16)
 	up_col.add_child(ut)
+	var up_scroll := ScrollContainer.new()
+	up_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	up_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	up_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	up_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	up_scroll.mouse_filter = Control.MOUSE_FILTER_STOP
+	up_col.add_child(up_scroll)
 	upgrade_box = VBoxContainer.new()
+	# CRITICAL: do NOT expand-fill vertically inside ScrollContainer or content won't overflow
 	upgrade_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	upgrade_box.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	upgrade_box.add_theme_constant_override("separation", 8)
-	up_col.add_child(upgrade_box)
+	up_scroll.add_child(upgrade_box)
 
 	_build_offline_modal()
 	_apply_content_width_cap()
@@ -481,7 +489,7 @@ func _rebuild_stations() -> void:
 		if id == "seal":
 			continue
 		var card := PanelContainer.new()
-		card.custom_minimum_size = Vector2(0, 72)
+		card.custom_minimum_size = Vector2(0, 70)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var csb := StyleBoxFlat.new()
 		csb.bg_color = Color("FFF3E8")
@@ -502,18 +510,16 @@ func _rebuild_stations() -> void:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 12)
 		card.add_child(row)
-		var icon_slot := Control.new()
-		icon_slot.custom_minimum_size = Vector2(64, 64)
-		icon_slot.size = Vector2(64, 64)
-		icon_slot.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		icon_slot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		row.add_child(icon_slot)
 		var icon := TextureRect.new()
 		icon.texture = _tex(icon_map.get(id, ICON + "UI_ICON_STATION_SHELF_temp.png"))
-		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		icon.custom_minimum_size = Vector2(64, 64)
+		icon.size = Vector2(64, 64)
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		icon_slot.add_child(icon)
+		icon.stretch_mode = TextureRect.STRETCH_SCALE
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(icon)
 		var col := VBoxContainer.new()
 		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		col.alignment = BoxContainer.ALIGNMENT_CENTER
