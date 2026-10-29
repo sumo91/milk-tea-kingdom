@@ -57,7 +57,7 @@ func _notification(what: int) -> void:
 func _apply_content_width_cap() -> void:
 	if _ui_root == null or _ui_pads.is_empty():
 		return
-	var inner_w := maxf(0.0, size.x - 32.0)
+	var inner_w := maxf(0.0, size.x - 48.0)
 	if inner_w > 720.0:
 		_ui_root.custom_minimum_size.x = 720.0
 		_ui_root.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -182,9 +182,9 @@ func _build_ui() -> void:
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 16)
+	margin.add_theme_constant_override("margin_left", 24)
 	margin.add_theme_constant_override("margin_top", 48)
-	margin.add_theme_constant_override("margin_right", 16)
+	margin.add_theme_constant_override("margin_right", 24)
 	margin.add_theme_constant_override("margin_bottom", 42)
 	add_child(margin)
 
@@ -274,7 +274,7 @@ func _build_ui() -> void:
 
 	var sell := Button.new()
 	sell.text = GameState.ui_string("sell_all", "卖出全部奶茶")
-	sell.custom_minimum_size = Vector2(0, 52)
+	sell.custom_minimum_size = Vector2(0, 56)
 	sell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_style_primary_btn(sell, true)
 	sell.pressed.connect(_on_sell_pressed)
@@ -312,8 +312,8 @@ func _build_ui() -> void:
 func _make_plus_btn() -> Button:
 	var btn := Button.new()
 	btn.text = "+"
-	btn.custom_minimum_size = Vector2(48, 48)
-	btn.size = Vector2(48, 48)
+	btn.custom_minimum_size = Vector2(56, 56)
+	btn.size = Vector2(56, 56)
 	btn.focus_mode = Control.FOCUS_NONE
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color("E8A0B0")
@@ -340,8 +340,8 @@ func _style_primary_btn(btn: Button, enabled: bool) -> void:
 	btn_sb.content_margin_right = 14
 	btn_sb.content_margin_top = 12
 	btn_sb.content_margin_bottom = 12
-	if btn.custom_minimum_size.y < 48.0:
-		btn.custom_minimum_size.y = 48.0
+	if btn.custom_minimum_size.y < 56.0:
+		btn.custom_minimum_size.y = 56.0
 	btn.add_theme_stylebox_override("normal", btn_sb)
 	btn.add_theme_stylebox_override("hover", btn_sb)
 	btn.add_theme_stylebox_override("pressed", btn_sb)
@@ -396,7 +396,7 @@ func _build_offline_modal() -> void:
 	inner.add_child(offline_label)
 	var claim := Button.new()
 	claim.text = GameState.ui_string("offline_claim", "收下")
-	claim.custom_minimum_size = Vector2(0, 48)
+	claim.custom_minimum_size = Vector2(0, 56)
 	claim.pressed.connect(_on_offline_ok)
 	inner.add_child(claim)
 
@@ -411,7 +411,10 @@ func _make_track(parent: Control, title: String, icon_path: String, fill_path: S
 	if icon_path != "":
 		var icon := TextureRect.new()
 		icon.texture = _tex(icon_path)
-		icon.custom_minimum_size = Vector2(28, 28)
+		icon.custom_minimum_size = Vector2(48, 48)
+		icon.size = Vector2(48, 48)
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		row.add_child(icon)
@@ -426,7 +429,7 @@ func _make_track(parent: Control, title: String, icon_path: String, fill_path: S
 	bar.nine_patch_stretch = true
 	bar.texture_under = _tex(MAIN + "UI_BAR_BG_temp.png")
 	bar.texture_progress = _tex(fill_path)
-	bar.custom_minimum_size = Vector2(0, 32)
+	bar.custom_minimum_size = Vector2(0, 36)
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_child(bar)
 	var lab := Label.new()
@@ -446,7 +449,10 @@ func _make_gold_track(parent: Control) -> Label:
 	box.add_child(row)
 	var icon := TextureRect.new()
 	icon.texture = _tex(ICON + "UI_ICON_GOLD_temp.png")
-	icon.custom_minimum_size = Vector2(28, 28)
+	icon.custom_minimum_size = Vector2(48, 48)
+	icon.size = Vector2(48, 48)
+	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	row.add_child(icon)
@@ -598,8 +604,8 @@ func _rebuild_upgrades() -> void:
 		info.add_child(pay)
 		var btn := Button.new()
 		btn.text = GameState.ui_string("upgrade_btn", "升级")
-		btn.custom_minimum_size = Vector2(112, 48)
-		btn.size = Vector2(112, 48)
+		btn.custom_minimum_size = Vector2(120, 56)
+		btn.size = Vector2(120, 56)
 		var cost := float(u.get("cost_gold", 0))
 		var can := GameState.gold >= cost
 		btn.disabled = not can
