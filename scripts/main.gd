@@ -1,5 +1,5 @@
 extends Control
-const UI_BUILD := "skin-inset-1"
+const UI_BUILD := "gutter-visible-1"
 ## V0-M main HUD @ 720×1280 portrait — Idle美术 wireframe + portrait panel skin.
 
 const ICON := "res://assets/ui/idle/icons/"
@@ -189,9 +189,9 @@ func _panel(parent: Control) -> PanelContainer:
 
 func _build_ui() -> void:
 	# Portrait 720×1280: 竖屏主底板（勿叠横版 UI_PANEL_MAIN_temp）
-	# Full-bleed page tint only (not measured as content gutter)
+	# Full-bleed gutter (must contrast cream skin so 24/56 insets are visible)
 	var page := ColorRect.new()
-	page.color = Color("FFFAF5")
+	page.color = Color("E8DFD4")
 	page.set_anchors_preset(Control.PRESET_FULL_RECT)
 	page.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(page)
