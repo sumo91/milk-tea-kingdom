@@ -1,4 +1,5 @@
 extends Control
+const UI_BUILD := "stall-wide-1"
 ## V0-M main HUD @ 720×1280 portrait — Idle美术 wireframe + portrait panel skin.
 
 const ICON := "res://assets/ui/idle/icons/"
@@ -679,3 +680,4 @@ func _on_sell_pressed() -> void:
 func _on_offline_ok() -> void:
 	offline_panel.visible = false
 	GameState.save_on_pause()
+
