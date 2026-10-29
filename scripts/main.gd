@@ -25,6 +25,10 @@ var _unlock_sig: String = ""
 var toast_label: Label
 var _ui_root: VBoxContainer
 var _ui_pads: Array = []
+var _ui_margin: Control
+var _ui_top: VBoxContainer
+var _ui_up_wrap: Control
+var _ui_up_scroll: ScrollContainer
 var _toast_t: float = 0.0
 
 func _ready() -> void:
@@ -52,6 +56,7 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		_apply_content_width_cap()
+		_apply_portrait_insets()
 
 
 func _apply_content_width_cap() -> void:
@@ -62,14 +67,31 @@ func _apply_content_width_cap() -> void:
 		_ui_root.custom_minimum_size.x = 720.0
 		_ui_root.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		_ui_root.size_flags_stretch_ratio = 0.0
+		_ui_pads[0].visible = true
+		_ui_pads[1].visible = true
 		_ui_pads[0].size_flags_stretch_ratio = 1.0
 		_ui_pads[1].size_flags_stretch_ratio = 1.0
 	else:
 		_ui_root.custom_minimum_size.x = 0.0
 		_ui_root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_ui_root.size_flags_stretch_ratio = 1.0
-		_ui_pads[0].size_flags_stretch_ratio = 0.001
-		_ui_pads[1].size_flags_stretch_ratio = 0.001
+		# Hide side pads on narrow so L/R inset is exactly offset 24
+		_ui_pads[0].visible = false
+		_ui_pads[1].visible = false
+
+
+func _apply_portrait_insets() -> void:
+	if _ui_margin == null:
+		return
+	# Hard insets: L/R ≥24, bottom ≥56; shorter top on short viewports
+	var top_m := 24.0 if size.y < 1000.0 else 48.0
+	_ui_margin.offset_left = 24
+	_ui_margin.offset_top = top_m
+	_ui_margin.offset_right = -24
+	_ui_margin.offset_bottom = -56
+	if _ui_up_wrap:
+		# Reserve viewport for ≥2 upgrade cards (72*2 + title/sep ≈ 168)
+		_ui_up_wrap.custom_minimum_size.y = 168.0
 
 
 
@@ -180,19 +202,21 @@ func _build_ui() -> void:
 	skin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(skin)
 
-	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 24)
-	margin.add_theme_constant_override("margin_top", 48)
-	margin.add_theme_constant_override("margin_right", 24)
-	margin.add_theme_constant_override("margin_bottom", 56)
+	# Insets via anchors/offsets (survive min-size pressure better than MarginContainer)
+	var margin := Control.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.offset_left = 24
+	margin.offset_top = 48
+	margin.offset_right = -24
+	margin.offset_bottom = -56
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(margin)
+	_ui_margin = margin
 
-	# Center column ≤720: top fixed + upgrade ScrollContainer (must be able to scroll)
+	# Center column ≤720: top fixed + upgrade ScrollContainer
 	var row := HBoxContainer.new()
+	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	row.add_theme_constant_override("separation", 0)
-	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(row)
 	var pad_l := Control.new()
 	pad_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -217,6 +241,7 @@ func _build_ui() -> void:
 	top.add_theme_constant_override("separation", 2)
 	top.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	col.add_child(top)
+	_ui_top = top
 
 	var title := Label.new()
 	title.text = GameState.ui_string("title", GameState.content_title())
@@ -288,32 +313,35 @@ func _build_ui() -> void:
 	# --- upgrades: dedicated scroll; min height ≈ 2 cards on 500×900 ---
 	var up_wrap := _panel(col)
 	up_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	up_wrap.size_flags_stretch_ratio = 2.0
-	up_wrap.custom_minimum_size = Vector2(0, 200)
+	up_wrap.size_flags_stretch_ratio = 3.0
+	up_wrap.custom_minimum_size = Vector2(0, 168)
+	_ui_up_wrap = up_wrap
 	var up_col := VBoxContainer.new()
-	up_col.add_theme_constant_override("separation", 4)
+	up_col.add_theme_constant_override("separation", 2)
 	up_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	up_wrap.add_child(up_col)
 	var ut := Label.new()
 	ut.text = GameState.ui_string("upgrade_title", "升级")
-	_ink_label(ut, 15)
+	_ink_label(ut, 14)
 	up_col.add_child(ut)
 	var up_scroll := ScrollContainer.new()
 	up_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	up_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	up_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	up_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	up_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_ALWAYS
 	up_scroll.mouse_filter = Control.MOUSE_FILTER_STOP
 	up_col.add_child(up_scroll)
+	_ui_up_scroll = up_scroll
 	upgrade_box = VBoxContainer.new()
 	# CRITICAL: do NOT expand-fill vertically inside ScrollContainer or content won't overflow
 	upgrade_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	upgrade_box.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	upgrade_box.add_theme_constant_override("separation", 8)
+	upgrade_box.add_theme_constant_override("separation", 6)
 	up_scroll.add_child(upgrade_box)
 
 	_build_offline_modal()
 	_apply_content_width_cap()
+	_apply_portrait_insets()
 
 
 func _make_plus_btn() -> Button:
@@ -487,74 +515,75 @@ func _rebuild_stations() -> void:
 		"brew_station": ICON + "UI_ICON_STATION_BREW_temp.png",
 		"stall": ICON + "UI_ICON_STATION_STALL_temp.png",
 	}
+	# One row of station chips — frees ~140px so upgrade scroll can show ≥2 cards on 500×900
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line_box.add_child(row)
 	for b in GameState.get_buildings():
 		var id := str(b.get("id", ""))
 		if id == "seal":
 			continue
 		var card := PanelContainer.new()
-		card.custom_minimum_size = Vector2(0, 64)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var csb := StyleBoxFlat.new()
 		csb.bg_color = Color("FFF3E8")
-		csb.corner_radius_top_left = 12
-		csb.corner_radius_top_right = 12
-		csb.corner_radius_bottom_left = 12
-		csb.corner_radius_bottom_right = 12
+		csb.corner_radius_top_left = 10
+		csb.corner_radius_top_right = 10
+		csb.corner_radius_bottom_left = 10
+		csb.corner_radius_bottom_right = 10
 		csb.border_width_left = 1
 		csb.border_width_top = 1
 		csb.border_width_right = 1
 		csb.border_width_bottom = 1
 		csb.border_color = Color("EDE4D7")
-		csb.content_margin_left = 6
-		csb.content_margin_right = 8
-		csb.content_margin_top = 0
-		csb.content_margin_bottom = 0
+		csb.content_margin_left = 4
+		csb.content_margin_right = 4
+		csb.content_margin_top = 4
+		csb.content_margin_bottom = 4
 		card.add_theme_stylebox_override("panel", csb)
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 8)
-		row.alignment = BoxContainer.ALIGNMENT_CENTER
-		card.add_child(row)
+		var cell := VBoxContainer.new()
+		cell.add_theme_constant_override("separation", 2)
+		cell.alignment = BoxContainer.ALIGNMENT_CENTER
+		card.add_child(cell)
 		var icon := TextureRect.new()
 		icon.texture = _tex(icon_map.get(id, ICON + "UI_ICON_STATION_SHELF_temp.png"))
 		icon.custom_minimum_size = Vector2(64, 64)
 		icon.size = Vector2(64, 64)
-		icon.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_SCALE
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		row.add_child(icon)
-		var col := VBoxContainer.new()
-		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		col.alignment = BoxContainer.ALIGNMENT_CENTER
-		col.add_theme_constant_override("separation", 0)
-		row.add_child(col)
+		cell.add_child(icon)
 		var unlocked := GameState.is_unlocked(id)
 		var lv := int(GameState.building_levels.get(id, 0))
 		var cb: Dictionary = GameState.content_building(id)
 		var disp_name := str(cb.get("name", b.get("name", "?")))
 		var name_l := Label.new()
-		name_l.text = "%s · %s" % [disp_name, GameState.ui_fmt("level_fmt", "Lv{n}", {"n": lv})]
-		_ink_label(name_l, 14)
-		col.add_child(name_l)
+		name_l.text = "%s Lv%d" % [disp_name, lv]
+		name_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_ink_label(name_l, 11)
+		cell.add_child(name_l)
 		var st := Label.new()
+		st.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		if unlocked:
 			match id:
 				"tea_garden":
-					st.text = GameState.ui_fmt("rate_fmt", "+{n}/分", {"n": "%.1f" % GameState.ingredient_rate()})
+					st.text = GameState.ui_fmt("rate_fmt", "+{n}/分", {"n": "%.0f" % GameState.ingredient_rate()})
 				"brew_station":
-					st.text = GameState.ui_fmt("rate_fmt", "+{n}/分", {"n": "%.2f" % GameState.brew_cycles_per_min()})
+					st.text = GameState.ui_fmt("rate_fmt", "+{n}/分", {"n": "%.1f" % GameState.brew_cycles_per_min()})
 				"stall":
-					st.text = GameState.ui_fmt("rate_fmt", "+{n}/分", {"n": "%.0f金/杯" % GameState.gold_per_cup})
+					st.text = GameState.ui_fmt("rate_fmt", "+{n}/分", {"n": "%.0f金" % GameState.gold_per_cup})
 				_:
-					st.text = str(cb.get("line_hint", ""))
+					st.text = ""
 		else:
 			var need := int(b.get("unlock_prestige", cb.get("unlock_prestige", 0)))
 			st.text = GameState.ui_fmt("locked_fmt", "声望{n}", {"n": need})
-		_ink_label(st, 12, true)
-		col.add_child(st)
+		_ink_label(st, 10, true)
+		cell.add_child(st)
 		card.modulate = Color(1, 1, 1, 1) if unlocked else Color(1, 1, 1, 0.55)
-		line_box.add_child(card)
+		row.add_child(card)
+
 
 func _rebuild_upgrades() -> void:
 	if upgrade_box == null:
