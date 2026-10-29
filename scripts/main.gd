@@ -23,10 +23,15 @@ var bar_prod: TextureProgressBar
 var bar_prestige: TextureProgressBar
 var _unlock_sig: String = ""
 var toast_label: Label
+var _ui_root: VBoxContainer
+var _ui_pads: Array = []
 var _toast_t: float = 0.0
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	var win := get_window()
+	win.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
+	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
 	_apply_cjk_theme()
 	_build_ui()
 	_rebuild_stations()
@@ -42,6 +47,31 @@ func _ready() -> void:
 		offline_panel.visible = true
 	else:
 		offline_panel.visible = false
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		_apply_content_width_cap()
+
+
+func _apply_content_width_cap() -> void:
+	if _ui_root == null or _ui_pads.is_empty():
+		return
+	var inner_w := maxf(0.0, size.x - 32.0)
+	if inner_w > 720.0:
+		_ui_root.custom_minimum_size.x = 720.0
+		_ui_root.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		_ui_root.size_flags_stretch_ratio = 0.0
+		_ui_pads[0].size_flags_stretch_ratio = 1.0
+		_ui_pads[1].size_flags_stretch_ratio = 1.0
+	else:
+		_ui_root.custom_minimum_size.x = 0.0
+		_ui_root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_ui_root.size_flags_stretch_ratio = 1.0
+		_ui_pads[0].size_flags_stretch_ratio = 0.001
+		_ui_pads[1].size_flags_stretch_ratio = 0.001
+
+
 
 func _process(delta: float) -> void:
 	if lbl_ing == null:
@@ -158,9 +188,24 @@ func _build_ui() -> void:
 	margin.add_theme_constant_override("margin_bottom", 42)
 	add_child(margin)
 
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 0)
+	margin.add_child(row)
+	var pad_l := Control.new()
+	pad_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(pad_l)
 	var root := VBoxContainer.new()
 	root.add_theme_constant_override("separation", 10)
-	margin.add_child(root)
+	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.custom_minimum_size = Vector2(0, 0)
+	# Soft cap ~720 design width; never shrink safe margins/icons with canvas scale
+	root.size_flags_stretch_ratio = 1.0
+	row.add_child(root)
+	var pad_r := Control.new()
+	pad_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(pad_r)
+	_ui_root = root
+	_ui_pads = [pad_l, pad_r]
 
 	var title := Label.new()
 	title.text = GameState.ui_string("title", GameState.content_title())
@@ -261,12 +306,14 @@ func _build_ui() -> void:
 	scroll.add_child(upgrade_box)
 
 	_build_offline_modal()
+	_apply_content_width_cap()
 
 
 func _make_plus_btn() -> Button:
 	var btn := Button.new()
 	btn.text = "+"
 	btn.custom_minimum_size = Vector2(48, 48)
+	btn.size = Vector2(48, 48)
 	btn.focus_mode = Control.FOCUS_NONE
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color("E8A0B0")
@@ -291,8 +338,10 @@ func _style_primary_btn(btn: Button, enabled: bool) -> void:
 	btn_sb.corner_radius_bottom_right = 10
 	btn_sb.content_margin_left = 14
 	btn_sb.content_margin_right = 14
-	btn_sb.content_margin_top = 10
-	btn_sb.content_margin_bottom = 10
+	btn_sb.content_margin_top = 12
+	btn_sb.content_margin_bottom = 12
+	if btn.custom_minimum_size.y < 48.0:
+		btn.custom_minimum_size.y = 48.0
 	btn.add_theme_stylebox_override("normal", btn_sb)
 	btn.add_theme_stylebox_override("hover", btn_sb)
 	btn.add_theme_stylebox_override("pressed", btn_sb)
@@ -347,7 +396,7 @@ func _build_offline_modal() -> void:
 	inner.add_child(offline_label)
 	var claim := Button.new()
 	claim.text = GameState.ui_string("offline_claim", "收下")
-	claim.custom_minimum_size = Vector2(0, 44)
+	claim.custom_minimum_size = Vector2(0, 48)
 	claim.pressed.connect(_on_offline_ok)
 	inner.add_child(claim)
 
@@ -451,6 +500,9 @@ func _rebuild_stations() -> void:
 		var icon := TextureRect.new()
 		icon.texture = _tex(icon_map.get(id, ICON + "UI_ICON_STATION_SHELF_temp.png"))
 		icon.custom_minimum_size = Vector2(64, 64)
+		icon.size = Vector2(64, 64)
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		row.add_child(icon)
@@ -547,6 +599,7 @@ func _rebuild_upgrades() -> void:
 		var btn := Button.new()
 		btn.text = GameState.ui_string("upgrade_btn", "升级")
 		btn.custom_minimum_size = Vector2(112, 48)
+		btn.size = Vector2(112, 48)
 		var cost := float(u.get("cost_gold", 0))
 		var can := GameState.gold >= cost
 		btn.disabled = not can
