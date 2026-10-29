@@ -135,28 +135,19 @@ func _panel(parent: Control) -> PanelContainer:
 	return p
 
 func _build_ui() -> void:
-	# Portrait-first (720×1280): 顶资源 → 声望 → 三站 → 出售 → 升级
+	# Portrait 720×1280 per Idle美术: 顶标题+声望 → 三资源竖叠 → 三站 → 出售 → 升级底
 	var page := ColorRect.new()
 	page.color = Color("FFFAF5")
 	page.set_anchors_preset(Control.PRESET_FULL_RECT)
 	page.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(page)
 
-	var bg := TextureRect.new()
-	bg.texture = _tex(MAIN + "UI_PANEL_MAIN_temp.png")
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	bg.stretch_mode = TextureRect.STRETCH_SCALE
-	bg.modulate = Color(1, 1, 1, 0.35)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(bg)
-
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 16)
-	margin.add_theme_constant_override("margin_top", 20)
+	margin.add_theme_constant_override("margin_top", 48)
 	margin.add_theme_constant_override("margin_right", 16)
-	margin.add_theme_constant_override("margin_bottom", 20)
+	margin.add_theme_constant_override("margin_bottom", 42)
 	add_child(margin)
 
 	var root := VBoxContainer.new()
@@ -176,8 +167,33 @@ func _build_ui() -> void:
 	toast_label.add_theme_color_override("font_color", Color("3D9B4A"))
 	root.add_child(toast_label)
 
-	# Resources: 3-up row (tea / cup / gold) then prestige full width
-	var tracks := HBoxContainer.new()
+	# Prestige thin bar under title (~10% band with title)
+	var pr_wrap := _panel(root)
+	var pr_box := VBoxContainer.new()
+	pr_box.add_theme_constant_override("separation", 4)
+	pr_wrap.add_child(pr_box)
+	var pr_row := HBoxContainer.new()
+	pr_row.add_theme_constant_override("separation", 8)
+	pr_box.add_child(pr_row)
+	var pr_name := Label.new()
+	pr_name.text = str(GameState.content_resource("prestige").get("name", "声望"))
+	_ink_label(pr_name, 14)
+	pr_row.add_child(pr_name)
+	lbl_prestige = Label.new()
+	lbl_prestige.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lbl_prestige.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_ink_label(lbl_prestige, 13, true)
+	pr_row.add_child(lbl_prestige)
+	bar_prestige = TextureProgressBar.new()
+	bar_prestige.custom_minimum_size = Vector2(0, 14)
+	bar_prestige.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bar_prestige.texture_under = _tex(MAIN + "UI_BAR_BG_temp.png")
+	bar_prestige.texture_progress = _tex(MAIN + "UI_BAR_FILL_PRESTIGE_temp.png")
+	bar_prestige.nine_patch_stretch = true
+	pr_box.add_child(bar_prestige)
+
+	# Three resource tracks stacked (~18%)
+	var tracks := VBoxContainer.new()
 	tracks.add_theme_constant_override("separation", 8)
 	root.add_child(tracks)
 	var t_ing := _make_track(tracks, str(GameState.content_resource("ingredient").get("name", "茶叶")), ICON + "UI_ICON_INGREDIENT_temp.png", MAIN + "UI_BAR_FILL_INGREDIENT_temp.png")
@@ -188,25 +204,10 @@ func _build_ui() -> void:
 	bar_prod = t_prod["bar"]
 	lbl_gold = _make_gold_track(tracks)
 
-	var pr_wrap := _panel(root)
-	var pr_box := VBoxContainer.new()
-	pr_wrap.add_child(pr_box)
-	var pr_name := Label.new()
-	pr_name.text = str(GameState.content_resource("prestige").get("name", "声望"))
-	_ink_label(pr_name, 14)
-	pr_box.add_child(pr_name)
-	bar_prestige = TextureProgressBar.new()
-	bar_prestige.custom_minimum_size = Vector2(0, 14)
-	bar_prestige.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bar_prestige.texture_under = _tex(MAIN + "UI_BAR_BG_temp.png")
-	bar_prestige.texture_progress = _tex(MAIN + "UI_BAR_FILL_PRESTIGE_temp.png")
-	bar_prestige.nine_patch_stretch = true
-	pr_box.add_child(bar_prestige)
-	lbl_prestige = Label.new()
-	_ink_label(lbl_prestige, 13, true)
-	pr_box.add_child(lbl_prestige)
-
+	# Stations vertical (~32%)
 	var line_wrap := _panel(root)
+	line_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	line_wrap.size_flags_stretch_ratio = 0.9
 	var line_col := VBoxContainer.new()
 	line_col.add_theme_constant_override("separation", 8)
 	line_wrap.add_child(line_col)
@@ -215,12 +216,12 @@ func _build_ui() -> void:
 	_ink_label(lt, 18)
 	line_col.add_child(lt)
 	line_box = VBoxContainer.new()
-	line_box.add_theme_constant_override("separation", 8)
+	line_box.add_theme_constant_override("separation", 10)
 	line_col.add_child(line_box)
 
 	var sell := Button.new()
 	sell.text = GameState.ui_string("sell_all", "卖出全部奶茶")
-	sell.custom_minimum_size = Vector2(0, 48)
+	sell.custom_minimum_size = Vector2(0, 52)
 	sell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_style_primary_btn(sell, true)
 	sell.pressed.connect(_on_sell_pressed)
@@ -231,8 +232,10 @@ func _build_ui() -> void:
 	_ink_label(hint, 12, true)
 	root.add_child(hint)
 
+	# Upgrades bottom (~35%) large cards
 	var up_wrap := _panel(root)
 	up_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	up_wrap.size_flags_stretch_ratio = 1.1
 	var up_col := VBoxContainer.new()
 	up_col.add_theme_constant_override("separation", 8)
 	up_wrap.add_child(up_col)
@@ -246,7 +249,7 @@ func _build_ui() -> void:
 	up_col.add_child(scroll)
 	upgrade_box = VBoxContainer.new()
 	upgrade_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	upgrade_box.add_theme_constant_override("separation", 8)
+	upgrade_box.add_theme_constant_override("separation", 10)
 	scroll.add_child(upgrade_box)
 
 	_build_offline_modal()
@@ -347,7 +350,7 @@ func _make_track(parent: Control, title: String, icon_path: String, fill_path: S
 	bar.nine_patch_stretch = true
 	bar.texture_under = _tex(MAIN + "UI_BAR_BG_temp.png")
 	bar.texture_progress = _tex(fill_path)
-	bar.custom_minimum_size = Vector2(0, 22)
+	bar.custom_minimum_size = Vector2(0, 36)
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_child(bar)
 	var lab := Label.new()
@@ -394,7 +397,7 @@ func _rebuild_stations() -> void:
 		row.add_theme_constant_override("separation", 12)
 		var icon := TextureRect.new()
 		icon.texture = _tex(icon_map.get(id, ICON + "UI_ICON_STATION_SEAL_temp.png"))
-		icon.custom_minimum_size = Vector2(56, 56)
+		icon.custom_minimum_size = Vector2(64, 64)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		row.add_child(icon)
@@ -451,15 +454,15 @@ func _rebuild_upgrades() -> void:
 		var card := PanelContainer.new()
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var sb := StyleBoxFlat.new()
-		sb.bg_color = Color("F7EFE4")
+		sb.bg_color = Color("FFF3E8")
 		sb.corner_radius_top_left = 10
 		sb.corner_radius_top_right = 10
 		sb.corner_radius_bottom_left = 10
 		sb.corner_radius_bottom_right = 10
-		sb.content_margin_left = 10
-		sb.content_margin_right = 10
-		sb.content_margin_top = 8
-		sb.content_margin_bottom = 8
+		sb.content_margin_left = 12
+		sb.content_margin_right = 12
+		sb.content_margin_top = 12
+		sb.content_margin_bottom = 12
 		card.add_theme_stylebox_override("panel", sb)
 		upgrade_box.add_child(card)
 		var row := HBoxContainer.new()
@@ -470,15 +473,19 @@ func _rebuild_upgrades() -> void:
 		row.add_child(info)
 		var name_l := Label.new()
 		name_l.text = str(u.get("name", id))
-		_ink_label(name_l, 15)
+		_ink_label(name_l, 16)
 		info.add_child(name_l)
 		var pay := Label.new()
-		pay.text = "%s · 花费 %s 金" % [GameState.ui_fmt("payback_fmt", "回本 ~{min} 分钟", {"min": u.get("payback_min_hint", "?")}), u.get("cost_gold", 0)]
+		pay.text = GameState.ui_fmt("payback_fmt", "回本 ~{min} 分钟", {"min": u.get("payback_min_hint", "?")})
 		_ink_label(pay, 12, true)
 		info.add_child(pay)
+		var cost_l := Label.new()
+		cost_l.text = "花费 %.0f 金" % float(u.get("cost_gold", 0))
+		_ink_label(cost_l, 13, true)
+		info.add_child(cost_l)
 		var btn := Button.new()
 		btn.text = GameState.ui_string("upgrade_btn", "升级")
-		btn.custom_minimum_size = Vector2(96, 40)
+		btn.custom_minimum_size = Vector2(112, 48)
 		var cost := float(u.get("cost_gold", 0))
 		var can := GameState.gold >= cost
 		btn.disabled = not can
