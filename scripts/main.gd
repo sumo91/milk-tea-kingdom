@@ -190,19 +190,26 @@ func _build_ui() -> void:
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 0)
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(row)
 	var pad_l := Control.new()
 	pad_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pad_l.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_child(pad_l)
+	var page_scroll := ScrollContainer.new()
+	page_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	page_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	page_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	row.add_child(page_scroll)
 	var root := VBoxContainer.new()
-	root.add_theme_constant_override("separation", 10)
+	root.add_theme_constant_override("separation", 8)
 	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.custom_minimum_size = Vector2(0, 0)
-	# Soft cap ~720 design width; never shrink safe margins/icons with canvas scale
-	root.size_flags_stretch_ratio = 1.0
-	row.add_child(root)
+	page_scroll.add_child(root)
 	var pad_r := Control.new()
 	pad_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pad_r.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_child(pad_r)
 	_ui_root = root
 	_ui_pads = [pad_l, pad_r]
@@ -210,7 +217,7 @@ func _build_ui() -> void:
 	var title := Label.new()
 	title.text = GameState.ui_string("title", GameState.content_title())
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_ink_label(title, 28)
+	_ink_label(title, 26)
 	root.add_child(title)
 
 	toast_label = Label.new()
@@ -247,7 +254,7 @@ func _build_ui() -> void:
 
 	# Three resource tracks stacked (~18%)
 	var tracks := VBoxContainer.new()
-	tracks.add_theme_constant_override("separation", 8)
+	tracks.add_theme_constant_override("separation", 6)
 	root.add_child(tracks)
 	var t_ing := _make_track(tracks, str(GameState.content_resource("ingredient").get("name", "茶叶")), ICON + "UI_ICON_INGREDIENT_temp.png", MAIN + "UI_BAR_FILL_INGREDIENT_temp.png")
 	lbl_ing = t_ing["label"]
@@ -259,17 +266,14 @@ func _build_ui() -> void:
 
 	# Stations vertical (~32%) — each station is its own card
 	var line_col := VBoxContainer.new()
-	line_col.add_theme_constant_override("separation", 8)
-	line_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	line_col.size_flags_stretch_ratio = 0.9
+	line_col.add_theme_constant_override("separation", 6)
 	root.add_child(line_col)
 	var lt := Label.new()
 	lt.text = GameState.ui_string("line_title", "产线")
 	_ink_label(lt, 18)
 	line_col.add_child(lt)
 	line_box = VBoxContainer.new()
-	line_box.add_theme_constant_override("separation", 8)
-	line_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	line_box.add_theme_constant_override("separation", 6)
 	line_col.add_child(line_box)
 
 	var sell := Button.new()
@@ -285,10 +289,8 @@ func _build_ui() -> void:
 	_ink_label(hint, 12, true)
 	root.add_child(hint)
 
-	# Upgrades bottom (~35%) large cards
+	# Upgrades: live in page scroll so ≥2 cards reachable; keep bottom safe margin
 	var up_wrap := _panel(root)
-	up_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	up_wrap.size_flags_stretch_ratio = 1.1
 	var up_col := VBoxContainer.new()
 	up_col.add_theme_constant_override("separation", 8)
 	up_wrap.add_child(up_col)
@@ -296,14 +298,10 @@ func _build_ui() -> void:
 	ut.text = GameState.ui_string("upgrade_title", "升级")
 	_ink_label(ut, 18)
 	up_col.add_child(ut)
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	up_col.add_child(scroll)
 	upgrade_box = VBoxContainer.new()
 	upgrade_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	upgrade_box.add_theme_constant_override("separation", 10)
-	scroll.add_child(upgrade_box)
+	upgrade_box.add_theme_constant_override("separation", 8)
+	up_col.add_child(upgrade_box)
 
 	_build_offline_modal()
 	_apply_content_width_cap()
@@ -482,7 +480,7 @@ func _rebuild_stations() -> void:
 		if id == "seal":
 			continue
 		var card := PanelContainer.new()
-		card.custom_minimum_size = Vector2(0, 100)
+		card.custom_minimum_size = Vector2(0, 84)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var csb := StyleBoxFlat.new()
 		csb.bg_color = Color("FFF3E8")
@@ -503,15 +501,18 @@ func _rebuild_stations() -> void:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 12)
 		card.add_child(row)
+		var icon_slot := Control.new()
+		icon_slot.custom_minimum_size = Vector2(64, 64)
+		icon_slot.size = Vector2(64, 64)
+		icon_slot.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		icon_slot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(icon_slot)
 		var icon := TextureRect.new()
 		icon.texture = _tex(icon_map.get(id, ICON + "UI_ICON_STATION_SHELF_temp.png"))
-		icon.custom_minimum_size = Vector2(64, 64)
-		icon.size = Vector2(64, 64)
-		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		row.add_child(icon)
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		icon_slot.add_child(icon)
 		var col := VBoxContainer.new()
 		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		col.alignment = BoxContainer.ALIGNMENT_CENTER
