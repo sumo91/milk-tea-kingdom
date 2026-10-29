@@ -1,5 +1,5 @@
 extends Control
-## V0 main HUD @ 1280×720 — numbers-first readable over 美术 _temp.
+## V0-M main HUD @ 720×1280 portrait — Idle美术 wireframe + portrait panel skin.
 
 const ICON := "res://assets/ui/idle/icons/"
 const MAIN := "res://assets/ui/idle/main/"
@@ -135,12 +135,20 @@ func _panel(parent: Control) -> PanelContainer:
 	return p
 
 func _build_ui() -> void:
-	# Portrait 720×1280 per Idle美术: 顶标题+声望 → 三资源竖叠 → 三站 → 出售 → 升级底
+	# Portrait 720×1280: 竖屏主底板（勿叠横版 UI_PANEL_MAIN_temp）
 	var page := ColorRect.new()
 	page.color = Color("FFFAF5")
 	page.set_anchors_preset(Control.PRESET_FULL_RECT)
 	page.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(page)
+
+	var skin := TextureRect.new()
+	skin.texture = _tex(MAIN + "UI_PANEL_MAIN_portrait_temp.png")
+	skin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	skin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	skin.stretch_mode = TextureRect.STRETCH_SCALE
+	skin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(skin)
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
