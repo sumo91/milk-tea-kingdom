@@ -7,7 +7,5 @@ mtk-web.tgz
 milk-tea-web.tar.gz
 .DS_Store
 *.tmp
-.gdeck/editor-token
-.gdeck/reports/
-.gdeck/captures/
+.gdeck/
 *.uid
