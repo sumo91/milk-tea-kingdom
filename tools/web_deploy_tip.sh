@@ -7,6 +7,12 @@
 #   sh tools/web_deploy_tip.sh
 #   sh tools/web_deploy_tip.sh build/web
 #   WEB_BASE_URL=https://sumo91.github.io/milk-tea-kingdom sh tools/web_deploy_tip.sh
+#
+# After the one deploy line, tools/art_asset_gate.py prints source sha256 of
+# the station icons and the portrait skin, and whether each imported ctex is
+# inside this pck. Art is only verifiable once it is in that pck. The phone
+# does not download the git PNG. A new source hash with an unchanged pck sha
+# is still the old art. Exits 1 if a key ctex is missing or the icon gate fails.
 
 set -eu
 
@@ -65,3 +71,10 @@ wasm_size=$(file_size "$WASM")
 
 printf '%s/?v=%s pck=sha256:%s size=%s wasm=sha256:%s size=%s ensureCrossOriginIsolationHeaders=false\n' \
 	"$BASE_URL" "$short" "$pck_sha" "$pck_size" "$wasm_sha" "$wasm_size"
+
+# Key art involvement. The line above is still the deploy identity.
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+if ! command -v python3 >/dev/null 2>&1; then
+	die "need python3 to report art inside the pck (tools/art_asset_gate.py)"
+fi
+python3 "$SCRIPT_DIR/art_asset_gate.py" --tip --pck "$PCK"

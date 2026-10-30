@@ -10,7 +10,8 @@
     "out_of_scope_v0": "硬货币、四国换皮、重置、事件数值",
     "prestige_gates": "茶园+调制台+摊位均开局可用（自动卖）；声望40起为后续内容闸，不锁卖出。",
     "deadlock_fix": "2026-10-29：调制台40锁已改为开局可调制。2026-10-30 V0-Q：摊位改 unlock 0，开局自动卖。",
-    "v0q_auto_sell": "开局自动卖；手动出售按钮可保留作冗余。"
+    "v0q_auto_sell": "开局自动卖；手动出售按钮可保留作冗余。",
+    "cap_boost_tier1": "不是解锁 id。曾写在 prestige_gates（声望 200 加容量），游戏不读这张表、也不生效。解锁 id 只保留茶园、调制台、摊位。"
   },
   "resources": [
     {
@@ -267,17 +268,14 @@
       "unlocks": "tea_garden"
     },
     {
-      "prestige": 40,
-      "unlocks": "brew_station"
+      "prestige": 0,
+      "unlocks": "brew_station",
+      "note": "2026-10-29 起开局可调制，不再锁声望 40"
     },
     {
       "prestige": 0,
       "unlocks": "stall",
       "note": "V0-Q open auto-sell"
-    },
-    {
-      "prestige": 200,
-      "unlocks": "cap_boost_tier1"
     }
   ]
 }
