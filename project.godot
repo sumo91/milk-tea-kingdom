@@ -27,6 +27,9 @@ window/stretch/mode=""
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
+; Web ships one pck. Do not import S3TC and ETC2/ASTC variants (they would both download).
+textures/vram_compression/import_s3tc_bptc=false
+textures/vram_compression/import_etc2_astc=false
 
 [editor_plugins]
 
