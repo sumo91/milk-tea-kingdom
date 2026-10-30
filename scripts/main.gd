@@ -1,6 +1,13 @@
 extends Control
-const UI_BUILD := "gutter-visible-1"
+const UI_BUILD := "portrait-fullbleed-1"
 ## V0-M main HUD @ 720×1280 portrait — Idle美术 wireframe + portrait panel skin.
+## Phone Web viewports are often ≥1170px wide. That is still portrait: fill the
+## width and scale the 720 design up. Only landscape / wide desktop letterboxes.
+
+const DESIGN_W := 720.0
+const DESIGN_H := 1280.0
+const INSET_L := 24.0
+const INSET_B := 56.0
 
 const ICON := "res://assets/ui/idle/icons/"
 const MAIN := "res://assets/ui/idle/main/"
@@ -34,9 +41,7 @@ var _toast_t: float = 0.0
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
-	var win := get_window()
-	win.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
-	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
+	_sync_content_scale()
 	_apply_cjk_theme()
 	_build_ui()
 	_rebuild_stations()
@@ -56,16 +61,69 @@ func _ready() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
+		_sync_content_scale()
 		_apply_content_width_cap()
 		_apply_portrait_insets()
+
+
+## Physical window pixels. Content scale shrinks Control.size to the 720-wide
+## virtual viewport; Window.size stays the real pixel size, which is what the
+## iPhone bug measured (≥1170).
+func _pixel_window_size() -> Vector2:
+	var win := get_window()
+	if win == null:
+		return size
+	var pixels := Vector2(win.size)
+	if pixels.x <= 1.0 or pixels.y <= 1.0:
+		return size
+	return pixels
+
+
+## Portrait (including phone widths ≥1170) never letterboxes. Cap only when the
+## window is clearly landscape and wider than the 720 column plus 24px insets.
+static func should_cap_content_width(window_size: Vector2) -> bool:
+	if window_size.y >= window_size.x:
+		return false
+	return window_size.x - (INSET_L * 2.0) > DESIGN_W
+
+
+## Uniform upscale of the 720×1280 design so text, icons, and buttons grow with
+## width. Returns 1 when upscale would shrink hotzones below their design pixels
+## (short/narrow windows, and every landscape window).
+static func portrait_upscale(window_size: Vector2) -> float:
+	if window_size.x <= DESIGN_W or window_size.y < window_size.x:
+		return 1.0
+	var scale := minf(window_size.x / DESIGN_W, window_size.y / DESIGN_H)
+	if scale < 1.0:
+		return 1.0
+	return scale
+
+
+func _sync_content_scale() -> void:
+	var win := get_window()
+	if win == null:
+		return
+	var up := portrait_upscale(_pixel_window_size())
+	if up > 1.0:
+		var base := Vector2i(int(DESIGN_W), int(DESIGN_H))
+		if win.content_scale_size != base:
+			win.content_scale_size = base
+		if win.content_scale_factor != 1.0:
+			win.content_scale_factor = 1.0
+		if win.content_scale_mode != Window.CONTENT_SCALE_MODE_CANVAS_ITEMS:
+			win.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+		if win.content_scale_aspect != Window.CONTENT_SCALE_ASPECT_EXPAND:
+			win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
+	elif win.content_scale_mode != Window.CONTENT_SCALE_MODE_DISABLED:
+		# 1:1 pixels. Landscape uses the 720 column; narrow portrait keeps ≥56 hotzones.
+		win.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
 
 
 func _apply_content_width_cap() -> void:
 	if _ui_root == null or _ui_pads.is_empty():
 		return
-	var inner_w := maxf(0.0, size.x - 48.0)
-	if inner_w > 720.0:
-		_ui_root.custom_minimum_size.x = 720.0
+	if should_cap_content_width(_pixel_window_size()):
+		_ui_root.custom_minimum_size.x = DESIGN_W
 		_ui_root.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		_ui_root.size_flags_stretch_ratio = 0.0
 		_ui_pads[0].visible = true
@@ -76,7 +134,7 @@ func _apply_content_width_cap() -> void:
 		_ui_root.custom_minimum_size.x = 0.0
 		_ui_root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_ui_root.size_flags_stretch_ratio = 1.0
-		# Hide side pads on narrow so L/R inset is exactly offset 24
+		# Hide side pads so L/R inset is exactly offset 24 (no extra gutter).
 		_ui_pads[0].visible = false
 		_ui_pads[1].visible = false
 
@@ -84,12 +142,14 @@ func _apply_content_width_cap() -> void:
 func _apply_portrait_insets() -> void:
 	if _ui_margin == null:
 		return
-	# Hard insets: L/R ≥24, bottom ≥56; shorter top on short viewports
-	var top_m := 24.0 if size.y < 1000.0 else 48.0
-	_ui_margin.offset_left = 24
+	# Hard insets: L/R ≥24, bottom ≥56; shorter top on short viewports.
+	# These are virtual pixels. Portrait upscale multiplies them on screen, so
+	# they stay ≥ the design minimums.
+	var top_m := INSET_L if size.y < 1000.0 else 48.0
+	_ui_margin.offset_left = INSET_L
 	_ui_margin.offset_top = top_m
-	_ui_margin.offset_right = -24
-	_ui_margin.offset_bottom = -56
+	_ui_margin.offset_right = -INSET_L
+	_ui_margin.offset_bottom = -INSET_B
 	if _ui_up_wrap:
 		# Reserve viewport for ≥2 upgrade cards (72*2 + title/sep ≈ 168)
 		_ui_up_wrap.custom_minimum_size.y = 168.0
@@ -199,10 +259,10 @@ func _build_ui() -> void:
 	# Shared inset root: skin + HUD share 24/48/24/56 so gutters are visible
 	var margin := Control.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.offset_left = 24
+	margin.offset_left = INSET_L
 	margin.offset_top = 48
-	margin.offset_right = -24
-	margin.offset_bottom = -56
+	margin.offset_right = -INSET_L
+	margin.offset_bottom = -INSET_B
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(margin)
 	_ui_margin = margin
@@ -215,7 +275,7 @@ func _build_ui() -> void:
 	skin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_child(skin)
 
-	# Center column ≤720: top fixed + upgrade ScrollContainer
+	# Column fills the inset panel. Landscape/desktop wider than 720 centers that column.
 	var row := HBoxContainer.new()
 	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	row.add_theme_constant_override("separation", 0)
