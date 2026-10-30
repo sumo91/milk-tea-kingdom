@@ -1,3 +1,7 @@
 # V0-M charset
 # count=184
+# content.json CJK is in ui_cjk_subset.otf. Boot HTML is system-font.
+# Missing from the otf until the next Mac subset rebuild (do not assume they render in-game):
+# 载 U+8F7D  游 U+6E38  戏 U+620F  马 U+9A6C  上 U+4E0A  好 U+597D  … U+2026
+# Already in the otf: 资 U+8D44  下 U+4E0B  加 U+52A0  源 U+6E90
 一三下不中为也了事产人仓件价会位余作你供俏保值偏做全内再冗写出击分到制副加动劲升卖卡原发口可台叶后员和品售商四回园国在场均垄堆声复多够失奶字存容封小少局屏已币帮应店开张得徽恢成或手把抬拍按换掉探提摇摊收改效散数文料无时晚暂有望期未本术杯果架档楼段每沉没涨源潮灶点照煮率王班用留皮看短硬碑离竖站章笔等紧级线给续置美自花茶营装解记调败货费资起足速部采里重量金钟钮锁闸降顶首
