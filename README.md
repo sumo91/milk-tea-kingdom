@@ -37,9 +37,15 @@ Godot 4 Web 发布目标 · 桌面调试骨架。与北境仓完全分离，勿�
   /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --export-release "Web" build/web/index.html
   sh tools/web_deploy_tip.sh
   ```
-- 部署提示一行：`?v=` git 短哈希、pck/wasm 的 sha256 和字节数、COI 必须为 false。见 `tools/web_deploy_tip.sh`。
-- 手机 Safari 验收文案：`tools/web_smoke_checklist.txt`。硬刷新后必须进主 HUD，不能只看哈希。
+- 部署提示一行：`?v=` git 短哈希、pck/wasm 的 sha256 和字节数、COI 必须为 false。见 `tools/web_deploy_tip.sh`。同一条命令会在下面列出三站图标和竖屏皮的源 sha256，以及它们的 ctex 是否在这个 pck 里。美术只有进了 pck 才算进包。
+- 手机 Safari 验收文案：`tools/web_smoke_checklist.txt`。硬刷新后必须进主 HUD，不能只看哈希。约 390 宽的全宽通过标准是第 7 条；桌面窗口拉窄不算手机通过。
 - 托管需正确 MIME（`.wasm` / `.pck`）。线程关闭，不需要 COOP/COEP。
+
+### 本地闸（不用 CI）
+
+- 平衡 / 内容：`python3 tools/balance_content_gate.py`。站、升级、解锁 id 对不齐，或经济表写了游戏没生效的占位（如 `waste_down` / `speed_up`），就失败。
+- 开局回本估算：`python3 tools/balance_content_gate.py --simulate`。假设写在 `python3 tools/balance_content_gate.py --help`。
+- 美术：`python3 tools/art_asset_gate.py`。三站图标槽约 64px，不透明外框不能太瘦或太透。皮的边距只打印、不失败。有 `build/web/index.pck` 时会核对 ctex 是否在包内。
 
 ### 包体（量过当前 `build/web`，更小的 pck 要等 Mac 再导出）
 

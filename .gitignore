@@ -9,3 +9,5 @@ milk-tea-web.tar.gz
 *.tmp
 .gdeck/
 *.uid
+__pycache__/
+*.pyc
