@@ -19,6 +19,9 @@ GameState="*res://scripts/game_state.gd"
 window/handheld/orientation=1
 window/size/viewport_width=720
 window/size/viewport_height=1280
+; Stretch stays off in the project file. main.gd enables canvas_items/expand
+; only for portrait windows that can scale the 720 design UP (phone widths
+; ≥1170). A static expand mode downscales short windows and shrinks ≥56 hotzones.
 window/stretch/mode=""
 
 [rendering]
